@@ -3,4 +3,4 @@ import { catalogController } from "./../controller/qgis.controller";
 
 export const routes = Router();
 
-routes.get('catalog',catalogController)
+routes.get('/catalog',catalogController)

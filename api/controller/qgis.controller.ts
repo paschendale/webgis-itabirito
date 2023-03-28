@@ -9,8 +9,6 @@ function errorTreatment(e: any) {
 
 export async function catalogController(req: Request, res: Response) {
 
-  consoleLog(`here`)
-
   try {
     
     const catalog = await getCatalog(req.header)
