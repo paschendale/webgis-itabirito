@@ -16,8 +16,12 @@ export const InfoPaneContainer = styled.div`
   pointer-events: all !important;
 `;
 
-export const FeatureTitleContainer = styled.div`
-  background-image: url('https://via.placeholder.com/300x80');
+interface FeatureTitleContainerProps {
+  background?: string;
+}
+
+export const FeatureTitleContainer = styled.div<FeatureTitleContainerProps>`
+  background-image: url('http://via.placeholder.com/300x80/000000?text=nothing to see here');
   width: 100%;
   min-height: 80px;
   margin-bottom: 5px;
@@ -25,22 +29,26 @@ export const FeatureTitleContainer = styled.div`
   flex-direction: column;
   justify-content: flex-end;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.5s;
 
-  /* &:hover {
+  &:hover {
     height: 120px;
-    background-image: url('https://via.placeholder.com/300x120');
-  } */
+    background-image: url('http://via.placeholder.com/300x120/000000?text=nothing to see here');
+  }
 `
 
 export const FeatureTitle = styled.p`
+  color: white;
   margin: 0;
+  font-size: small;
   padding-left: 15px;
 `
 
-export const FeatureId = styled.h2`
+export const FeatureId = styled.h3`
+  color: white;
   margin: 0;
   padding-left: 15px;
+  padding-bottom: 5px;
 `
 
 export const FeatureAttributesContainer = styled.div`

@@ -25,6 +25,15 @@ interface FeatureContainerProps {
 
 function FeatureContainer({feature,index}: FeatureContainerProps) {
   const[open,setOpen] = useState(false)
+  
+  function getFeatureMiniature(feature: any): string {
+
+    if(feature.geometry) {
+      return 'http://via.placeholder.com/300x80/000000?text=there is miniature'
+    } else {
+      return 'http://via.placeholder.com/300x80/000000?text=nothing to see here'
+    }
+  }
 
   function attributesToArray(object: any) {
 
@@ -72,7 +81,12 @@ function FeatureContainer({feature,index}: FeatureContainerProps) {
 
 function InfoPanel({features,isLoading,display}: InfoPaneProps) {
 
-  if (isLoading) {
+  if (!display) {
+
+    return (
+      <></>
+    )
+  } else if (isLoading) {
 
     return (
       <InfoPaneContainer>

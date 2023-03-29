@@ -14,13 +14,14 @@ interface Layer {
 }
 
 function Map() {
+  // Project states
   const[projectId,setProjectId] = useState('7bdc970b4a613172c8a145565cff1014')
   const[projectSettings,setProjectSettings] = useState({})
   const[layerOrder,setLayerOrder] = useState<string>('')
   const[layers,setLayers] = useState<Array<Layer>>()
 
   // Info Panel states
-  const[displayInfoPane,setDisplayInfoPane] = useState(false)
+  const[displayInfoPanel,setDisplayInfoPanel] = useState(false)
   const[features,setFeatures] = useState([])
   const[isLoadingInfoPanel,setIsLoadingInfoPanel] = useState(true)
 
@@ -111,6 +112,7 @@ function Map() {
     var featureInfo = response.data
 
     console.log(featureInfo)
+
     setIsLoadingInfoPanel(false)   
     setFeatures(featureInfo.features)
     return featureInfo
@@ -120,8 +122,10 @@ function Map() {
     
     useMapEvents({
         click(e) {
-          
-          console.log("🚀 ~ file: index.tsx:108 ~ click ~ e", e)
+
+          if(!displayInfoPanel) {
+            setDisplayInfoPanel(true)
+          }
           setIsLoadingInfoPanel(true) 
           getFeatureInfo(this,e)
         },
@@ -136,12 +140,12 @@ function Map() {
       <InfoPanel 
         features={features} 
         isLoading={isLoadingInfoPanel}
-        display={true}
+        display={displayInfoPanel}
       />
       <MapContainer 
         center={[-20.25554, -43.80376]} 
         zoom={17} 
-        scrollWheelZoom={false}
+        scrollWheelZoom={true}
         >        
         <MapHandlers/>
         {layers && <>
