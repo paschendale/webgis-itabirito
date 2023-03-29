@@ -7,7 +7,7 @@ export function consoleLog(content: any) {
 
 export function parseXML(xml: string) {
 
-    const parser = new XMLParser();
+    const parser = new XMLParser({ignoreAttributes: false});
 
     let jsonObject = parser.parse(xml)
 

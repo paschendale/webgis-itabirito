@@ -1,64 +1,154 @@
 import { MapContainer, useMapEvents, WMSTileLayer } from 'react-leaflet'
-// import { useMap } from 'react-leaflet/hooks'
 import 'leaflet/dist/leaflet.css';
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import SearchBox from '../searchbox';
 import InfoPanel from '../info-panel';
 import { Container } from './styles';
+import { api } from '../../services/api';
+import { LeafletMouseEvent } from 'leaflet';
+import { generateQueryParams } from '../../utils';
+
+interface Layer {
+  '@_queryable': string;
+  Name: string,
+}
 
 function Map() {
+  const[projectId,setProjectId] = useState('7bdc970b4a613172c8a145565cff1014')
+  const[projectSettings,setProjectSettings] = useState({})
+  const[layerOrder,setLayerOrder] = useState<string>('')
+  const[layers,setLayers] = useState<Array<Layer>>()
 
-  var [displayInfoPane,setInfoPaneDisplay] = useState(false)
+  // Info Panel states
+  const[displayInfoPane,setDisplayInfoPane] = useState(false)
+  const[features,setFeatures] = useState([])
+  const[isLoadingInfoPanel,setIsLoadingInfoPanel] = useState(true)
 
-  var features = [
-    {"geometry":null,"id":"rrcm_principal_p.2468","properties":{"Altitude Geom.":843.424,"Altitude Normal":848.634,"Bairro":"Centro","Código":"P-0164","Data Levantamento":"2022-09-01","Data Processamento":"2022-10-24","Desvio Padrão (m)":0.001,"Endereço":"Avenida Queiroz Júnior, Centro, Itabirito, Minas Gerais, 35450-069","Este":625001.677,"Fotografia 01":"DCIM/p0164-2.jpg","Fotografia 02":"DCIM/p0164-1.jpg","Itinerário":"Partindo do edifício da Prefeitura Municipal de Itabirito seguir na direção sul na Avenida Queiroz Júnior em direção à Rua Artur Bernardes por aproximadamente 600 metros.","Latitude":-20.2554648888889,"Longitude":-43.8031388611111,"Métodos de Determinação":"Posicionamento por GNSS","Norte":7759796.488,"Observações":null,"SG de Referência":"SIRGAS 2000","Vértices de Referência":"S-001","datum_altimetrico":"Imbituba-SC","id":2468,"lat_GMS":"-20°15′19,674″","long_GMS":"-43°48′11,300″","responsavel_preenchimento":"Natália","responsavel_tecnico":"Grupo de Engenharia para Gestão Territorial - GENTE UFV","tipo_materializacao":"Chapa metálica incrustada"},"type":"Feature"},
-    {"geometry":null,"id":"rrcm_principal_p.2468","properties":{"Altitude Geom.":843.424,"Altitude Normal":848.634,"Bairro":"Centro","Código":"P-0164","Data Levantamento":"2022-09-01","Data Processamento":"2022-10-24","Desvio Padrão (m)":0.001,"Endereço":"Avenida Queiroz Júnior, Centro, Itabirito, Minas Gerais, 35450-069","Este":625001.677,"Fotografia 01":"DCIM/p0164-2.jpg","Fotografia 02":"DCIM/p0164-1.jpg","Itinerário":"Partindo do edifício da Prefeitura Municipal de Itabirito seguir na direção sul na Avenida Queiroz Júnior em direção à Rua Artur Bernardes por aproximadamente 600 metros.","Latitude":-20.2554648888889,"Longitude":-43.8031388611111,"Métodos de Determinação":"Posicionamento por GNSS","Norte":7759796.488,"Observações":null,"SG de Referência":"SIRGAS 2000","Vértices de Referência":"S-001","datum_altimetrico":"Imbituba-SC","id":2468,"lat_GMS":"-20°15′19,674″","long_GMS":"-43°48′11,300″","responsavel_preenchimento":"Natália","responsavel_tecnico":"Grupo de Engenharia para Gestão Territorial - GENTE UFV","tipo_materializacao":"Chapa metálica incrustada"},"type":"Feature"},
-    {"geometry":null,"id":"rrcm_principal_p.2468","properties":{"Altitude Geom.":843.424,"Altitude Normal":848.634,"Bairro":"Centro","Código":"P-0164","Data Levantamento":"2022-09-01","Data Processamento":"2022-10-24","Desvio Padrão (m)":0.001,"Endereço":"Avenida Queiroz Júnior, Centro, Itabirito, Minas Gerais, 35450-069","Este":625001.677,"Fotografia 01":"DCIM/p0164-2.jpg","Fotografia 02":"DCIM/p0164-1.jpg","Itinerário":"Partindo do edifício da Prefeitura Municipal de Itabirito seguir na direção sul na Avenida Queiroz Júnior em direção à Rua Artur Bernardes por aproximadamente 600 metros.","Latitude":-20.2554648888889,"Longitude":-43.8031388611111,"Métodos de Determinação":"Posicionamento por GNSS","Norte":7759796.488,"Observações":null,"SG de Referência":"SIRGAS 2000","Vértices de Referência":"S-001","datum_altimetrico":"Imbituba-SC","id":2468,"lat_GMS":"-20°15′19,674″","long_GMS":"-43°48′11,300″","responsavel_preenchimento":"Natália","responsavel_tecnico":"Grupo de Engenharia para Gestão Territorial - GENTE UFV","tipo_materializacao":"Chapa metálica incrustada"},"type":"Feature"},
-    {"geometry":null,"id":"rrcm_principal_p.2468","properties":{"Altitude Geom.":843.424,"Altitude Normal":848.634,"Bairro":"Centro","Código":"P-0164","Data Levantamento":"2022-09-01","Data Processamento":"2022-10-24","Desvio Padrão (m)":0.001,"Endereço":"Avenida Queiroz Júnior, Centro, Itabirito, Minas Gerais, 35450-069","Este":625001.677,"Fotografia 01":"DCIM/p0164-2.jpg","Fotografia 02":"DCIM/p0164-1.jpg","Itinerário":"Partindo do edifício da Prefeitura Municipal de Itabirito seguir na direção sul na Avenida Queiroz Júnior em direção à Rua Artur Bernardes por aproximadamente 600 metros.","Latitude":-20.2554648888889,"Longitude":-43.8031388611111,"Métodos de Determinação":"Posicionamento por GNSS","Norte":7759796.488,"Observações":null,"SG de Referência":"SIRGAS 2000","Vértices de Referência":"S-001","datum_altimetrico":"Imbituba-SC","id":2468,"lat_GMS":"-20°15′19,674″","long_GMS":"-43°48′11,300″","responsavel_preenchimento":"Natália","responsavel_tecnico":"Grupo de Engenharia para Gestão Territorial - GENTE UFV","tipo_materializacao":"Chapa metálica incrustada"},"type":"Feature"},
-    {"geometry":null,"id":"rrcm_principal_p.2468","properties":{"Altitude Geom.":843.424,"Altitude Normal":848.634,"Bairro":"Centro","Código":"P-0164","Data Levantamento":"2022-09-01","Data Processamento":"2022-10-24","Desvio Padrão (m)":0.001,"Endereço":"Avenida Queiroz Júnior, Centro, Itabirito, Minas Gerais, 35450-069","Este":625001.677,"Fotografia 01":"DCIM/p0164-2.jpg","Fotografia 02":"DCIM/p0164-1.jpg","Itinerário":"Partindo do edifício da Prefeitura Municipal de Itabirito seguir na direção sul na Avenida Queiroz Júnior em direção à Rua Artur Bernardes por aproximadamente 600 metros.","Latitude":-20.2554648888889,"Longitude":-43.8031388611111,"Métodos de Determinação":"Posicionamento por GNSS","Norte":7759796.488,"Observações":null,"SG de Referência":"SIRGAS 2000","Vértices de Referência":"S-001","datum_altimetrico":"Imbituba-SC","id":2468,"lat_GMS":"-20°15′19,674″","long_GMS":"-43°48′11,300″","responsavel_preenchimento":"Natália","responsavel_tecnico":"Grupo de Engenharia para Gestão Territorial - GENTE UFV","tipo_materializacao":"Chapa metálica incrustada"},"type":"Feature"},
-    {"geometry":null,"id":"rrcm_principal_p.2468","properties":{"Altitude Geom.":843.424,"Altitude Normal":848.634,"Bairro":"Centro","Código":"P-0164","Data Levantamento":"2022-09-01","Data Processamento":"2022-10-24","Desvio Padrão (m)":0.001,"Endereço":"Avenida Queiroz Júnior, Centro, Itabirito, Minas Gerais, 35450-069","Este":625001.677,"Fotografia 01":"DCIM/p0164-2.jpg","Fotografia 02":"DCIM/p0164-1.jpg","Itinerário":"Partindo do edifício da Prefeitura Municipal de Itabirito seguir na direção sul na Avenida Queiroz Júnior em direção à Rua Artur Bernardes por aproximadamente 600 metros.","Latitude":-20.2554648888889,"Longitude":-43.8031388611111,"Métodos de Determinação":"Posicionamento por GNSS","Norte":7759796.488,"Observações":null,"SG de Referência":"SIRGAS 2000","Vértices de Referência":"S-001","datum_altimetrico":"Imbituba-SC","id":2468,"lat_GMS":"-20°15′19,674″","long_GMS":"-43°48′11,300″","responsavel_preenchimento":"Natália","responsavel_tecnico":"Grupo de Engenharia para Gestão Territorial - GENTE UFV","tipo_materializacao":"Chapa metálica incrustada"},"type":"Feature"},
-    {"geometry":null,"id":"rrcm_principal_p.2468","properties":{"Altitude Geom.":843.424,"Altitude Normal":848.634,"Bairro":"Centro","Código":"P-0164","Data Levantamento":"2022-09-01","Data Processamento":"2022-10-24","Desvio Padrão (m)":0.001,"Endereço":"Avenida Queiroz Júnior, Centro, Itabirito, Minas Gerais, 35450-069","Este":625001.677,"Fotografia 01":"DCIM/p0164-2.jpg","Fotografia 02":"DCIM/p0164-1.jpg","Itinerário":"Partindo do edifício da Prefeitura Municipal de Itabirito seguir na direção sul na Avenida Queiroz Júnior em direção à Rua Artur Bernardes por aproximadamente 600 metros.","Latitude":-20.2554648888889,"Longitude":-43.8031388611111,"Métodos de Determinação":"Posicionamento por GNSS","Norte":7759796.488,"Observações":null,"SG de Referência":"SIRGAS 2000","Vértices de Referência":"S-001","datum_altimetrico":"Imbituba-SC","id":2468,"lat_GMS":"-20°15′19,674″","long_GMS":"-43°48′11,300″","responsavel_preenchimento":"Natália","responsavel_tecnico":"Grupo de Engenharia para Gestão Territorial - GENTE UFV","tipo_materializacao":"Chapa metálica incrustada"},"type":"Feature"},
-    {"geometry":null,"id":"rrcm_principal_p.2468","properties":{"Altitude Geom.":843.424,"Altitude Normal":848.634,"Bairro":"Centro","Código":"P-0164","Data Levantamento":"2022-09-01","Data Processamento":"2022-10-24","Desvio Padrão (m)":0.001,"Endereço":"Avenida Queiroz Júnior, Centro, Itabirito, Minas Gerais, 35450-069","Este":625001.677,"Fotografia 01":"DCIM/p0164-2.jpg","Fotografia 02":"DCIM/p0164-1.jpg","Itinerário":"Partindo do edifício da Prefeitura Municipal de Itabirito seguir na direção sul na Avenida Queiroz Júnior em direção à Rua Artur Bernardes por aproximadamente 600 metros.","Latitude":-20.2554648888889,"Longitude":-43.8031388611111,"Métodos de Determinação":"Posicionamento por GNSS","Norte":7759796.488,"Observações":null,"SG de Referência":"SIRGAS 2000","Vértices de Referência":"S-001","datum_altimetrico":"Imbituba-SC","id":2468,"lat_GMS":"-20°15′19,674″","long_GMS":"-43°48′11,300″","responsavel_preenchimento":"Natália","responsavel_tecnico":"Grupo de Engenharia para Gestão Territorial - GENTE UFV","tipo_materializacao":"Chapa metálica incrustada"},"type":"Feature"},
-    {"geometry":null,"id":"rrcm_principal_p.2468","properties":{"Altitude Geom.":843.424,"Altitude Normal":848.634,"Bairro":"Centro","Código":"P-0164","Data Levantamento":"2022-09-01","Data Processamento":"2022-10-24","Desvio Padrão (m)":0.001,"Endereço":"Avenida Queiroz Júnior, Centro, Itabirito, Minas Gerais, 35450-069","Este":625001.677,"Fotografia 01":"DCIM/p0164-2.jpg","Fotografia 02":"DCIM/p0164-1.jpg","Itinerário":"Partindo do edifício da Prefeitura Municipal de Itabirito seguir na direção sul na Avenida Queiroz Júnior em direção à Rua Artur Bernardes por aproximadamente 600 metros.","Latitude":-20.2554648888889,"Longitude":-43.8031388611111,"Métodos de Determinação":"Posicionamento por GNSS","Norte":7759796.488,"Observações":null,"SG de Referência":"SIRGAS 2000","Vértices de Referência":"S-001","datum_altimetrico":"Imbituba-SC","id":2468,"lat_GMS":"-20°15′19,674″","long_GMS":"-43°48′11,300″","responsavel_preenchimento":"Natália","responsavel_tecnico":"Grupo de Engenharia para Gestão Territorial - GENTE UFV","tipo_materializacao":"Chapa metálica incrustada"},"type":"Feature"},
-    {"geometry":null,"id":"rrcm_principal_p.2468","properties":{"Altitude Geom.":843.424,"Altitude Normal":848.634,"Bairro":"Centro","Código":"P-0164","Data Levantamento":"2022-09-01","Data Processamento":"2022-10-24","Desvio Padrão (m)":0.001,"Endereço":"Avenida Queiroz Júnior, Centro, Itabirito, Minas Gerais, 35450-069","Este":625001.677,"Fotografia 01":"DCIM/p0164-2.jpg","Fotografia 02":"DCIM/p0164-1.jpg","Itinerário":"Partindo do edifício da Prefeitura Municipal de Itabirito seguir na direção sul na Avenida Queiroz Júnior em direção à Rua Artur Bernardes por aproximadamente 600 metros.","Latitude":-20.2554648888889,"Longitude":-43.8031388611111,"Métodos de Determinação":"Posicionamento por GNSS","Norte":7759796.488,"Observações":null,"SG de Referência":"SIRGAS 2000","Vértices de Referência":"S-001","datum_altimetrico":"Imbituba-SC","id":2468,"lat_GMS":"-20°15′19,674″","long_GMS":"-43°48′11,300″","responsavel_preenchimento":"Natália","responsavel_tecnico":"Grupo de Engenharia para Gestão Territorial - GENTE UFV","tipo_materializacao":"Chapa metálica incrustada"},"type":"Feature"},
-    {"geometry":null,"id":"rrcm_principal_p.2468","properties":{"Altitude Geom.":843.424,"Altitude Normal":848.634,"Bairro":"Centro","Código":"P-0164","Data Levantamento":"2022-09-01","Data Processamento":"2022-10-24","Desvio Padrão (m)":0.001,"Endereço":"Avenida Queiroz Júnior, Centro, Itabirito, Minas Gerais, 35450-069","Este":625001.677,"Fotografia 01":"DCIM/p0164-2.jpg","Fotografia 02":"DCIM/p0164-1.jpg","Itinerário":"Partindo do edifício da Prefeitura Municipal de Itabirito seguir na direção sul na Avenida Queiroz Júnior em direção à Rua Artur Bernardes por aproximadamente 600 metros.","Latitude":-20.2554648888889,"Longitude":-43.8031388611111,"Métodos de Determinação":"Posicionamento por GNSS","Norte":7759796.488,"Observações":null,"SG de Referência":"SIRGAS 2000","Vértices de Referência":"S-001","datum_altimetrico":"Imbituba-SC","id":2468,"lat_GMS":"-20°15′19,674″","long_GMS":"-43°48′11,300″","responsavel_preenchimento":"Natália","responsavel_tecnico":"Grupo de Engenharia para Gestão Territorial - GENTE UFV","tipo_materializacao":"Chapa metálica incrustada"},"type":"Feature"},
-    {"geometry":null,"id":"rrcm_principal_p.2468","properties":{"Altitude Geom.":843.424,"Altitude Normal":848.634,"Bairro":"Centro","Código":"P-0164","Data Levantamento":"2022-09-01","Data Processamento":"2022-10-24","Desvio Padrão (m)":0.001,"Endereço":"Avenida Queiroz Júnior, Centro, Itabirito, Minas Gerais, 35450-069","Este":625001.677,"Fotografia 01":"DCIM/p0164-2.jpg","Fotografia 02":"DCIM/p0164-1.jpg","Itinerário":"Partindo do edifício da Prefeitura Municipal de Itabirito seguir na direção sul na Avenida Queiroz Júnior em direção à Rua Artur Bernardes por aproximadamente 600 metros.","Latitude":-20.2554648888889,"Longitude":-43.8031388611111,"Métodos de Determinação":"Posicionamento por GNSS","Norte":7759796.488,"Observações":null,"SG de Referência":"SIRGAS 2000","Vértices de Referência":"S-001","datum_altimetrico":"Imbituba-SC","id":2468,"lat_GMS":"-20°15′19,674″","long_GMS":"-43°48′11,300″","responsavel_preenchimento":"Natália","responsavel_tecnico":"Grupo de Engenharia para Gestão Territorial - GENTE UFV","tipo_materializacao":"Chapa metálica incrustada"},"type":"Feature"}
-  ]
+  useEffect(() => {
 
-  // function MapFn() {
+    async function getProjectSettings() {
     
-  //   useMapEvents({
-  //     click(e) {
-  //       console.log(e)
-  //       setInfoPaneDisplay(!displayInfoPane)
-  //     }
-  //   })
-  //   return null
-  // }
+      const projectSettings = await api.get(
+        `/settings/${projectId}` 
+      )
+  
+      return projectSettings.data
+    }
+    
+    getProjectSettings()
+    .then(settings => {
+
+      console.log(settings)
+      setLayerOrder(settings.layerDrawingOrder)
+      setLayers(settings.layers.Layer)
+      setProjectSettings(settings)
+    })
+  },[projectId])
+
+  function makeLayers(layers: any, order: string) {
+
+    const content = order.split(',').map(
+      (e,i) => {
+        
+        var layer = createLayer(
+          layers.filter((l:any) => (l.Name === e))[0],
+          (i === 0)
+        )
+        return layer
+      })
+
+    return content
+  }
+
+  function createLayer(layer: any, baseLayer?: boolean) {
+
+    if(!baseLayer) {
+      baseLayer = false
+    }
+
+    return (
+      <WMSTileLayer
+        key={layer.Name}
+        id={layer.Name}
+        url={`/api/map/${projectId}`}
+        layers={layer.Name}
+        format={baseLayer ? 'image/jpeg' : 'image/png'}
+        transparent={!baseLayer}
+      />
+    )
+  }
+
+  async function getFeatureInfo(map: any, e: LeafletMouseEvent) {
+
+      var point = map.latLngToContainerPoint(e.latlng)
+      var size = map.getSize()
+      var crs = map.options.crs
+      var sw = crs?.project(map.getBounds().getSouthWest())
+      var ne = crs?.project(map.getBounds().getNorthEast())
+      var lyrs = layers?.filter(e => e['@_queryable'] === '1').map(e => e.Name)
+
+      var params = {
+        request: 'GetFeatureInfo',
+        service: 'WMS',
+        version: '1.1.0',
+        srs: 'EPSG:3857',
+        x: JSON.stringify(point.x),
+        y: JSON.stringify(point.y),
+        bbox: JSON.stringify(sw?.x) + ',' + JSON.stringify(sw?.y) + ',' + JSON.stringify(ne?.x) + ',' + JSON.stringify(ne?.y),
+        height: JSON.stringify(size.y),
+        width: JSON.stringify(size.x),
+        layers: lyrs?.join(','),
+        query_layers: lyrs?.join(','),
+        info_format: 'application/json',
+        with_geometry: 'true',
+        feature_count: '50000'
+    };
+
+    var queryParams = generateQueryParams(params)
+
+    var response = await api.get(`/map/${projectId}?${queryParams}`)
+
+    var featureInfo = response.data
+
+    console.log(featureInfo)
+    setIsLoadingInfoPanel(false)   
+    setFeatures(featureInfo.features)
+    return featureInfo
+  }
+
+  const MapHandlers = () => {
+    
+    useMapEvents({
+        click(e) {
+          
+          console.log("🚀 ~ file: index.tsx:108 ~ click ~ e", e)
+          setIsLoadingInfoPanel(true) 
+          getFeatureInfo(this,e)
+        },
+    });
+
+    return null;
+  };
 
   return ( 
     <Container>
+      <SearchBox/>
+      <InfoPanel 
+        features={features} 
+        isLoading={isLoadingInfoPanel}
+        display={true}
+      />
       <MapContainer 
         center={[-20.25554, -43.80376]} 
         zoom={17} 
         scrollWheelZoom={false}
         >        
-        <SearchBox/>
-        <InfoPanel 
-          features={features} 
-          display={displayInfoPane}
-        />
-        <WMSTileLayer
-          url={'https://itabirito.genteufv.com.br/server/81885c84ccbee7fb8ac07a67612f5485'}
-          layers={'mosaic_maxar_70C8bit3bandscompress'}
-          transparent={true}
-        />
-        <WMSTileLayer
-          url={'https://itabirito.genteufv.com.br/server/81885c84ccbee7fb8ac07a67612f5485'}
-          layers={'rrcm_superior_p'}
-          transparent={true}
-          format={'image/png'}
-        />
+        <MapHandlers/>
+        {layers && <>
+          {
+            makeLayers(layers,layerOrder)
+          }
+        </>}
       </MapContainer>
     </Container>
   );

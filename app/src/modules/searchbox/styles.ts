@@ -4,7 +4,7 @@ export const SearchBoxContainer = styled.div`
   width: 300px;
   height: 60px;
   background-color: whitesmoke;
-  position: relative;
+  position: absolute;
   z-index: 1000;
   margin: 10px;
   margin-left: 50px;
