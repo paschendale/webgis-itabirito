@@ -12,8 +12,12 @@ export async function getProjectByName(projectName: string, headers?: any) {
   return response
 }
 
-export async function getProjectById(projectId: string, headers?: any) {
+export async function getProjectSettings(projectId: string, headers?: any) {
 
-  const response = await qgis.get(`/project/${projectId}?`,{headers: headers})
+  const response = await qgis.get(`/project/${projectId}?service=WMS&request=GetProjectSettings`,{headers: headers})
   return response
+}
+
+export async function getMap() {
+  return null
 }

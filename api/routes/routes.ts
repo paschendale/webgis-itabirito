@@ -1,6 +1,9 @@
 import { Router } from "express";
-import { catalogController } from "./../controller/qgis.controller";
+import { catalogController, projectSettingsController } from "./../controller/qgis.controller";
 
 export const routes = Router();
 
-routes.get('/catalog',catalogController)
+const baseHref = '/api'
+
+routes.get(baseHref + '/catalog',catalogController)
+routes.get(baseHref + '/map/settings/:id',projectSettingsController)
