@@ -9,7 +9,8 @@ import {
   FeatureAttributesContainer, 
   PropertyName,
   PropertyValue,
-  PropertyContainer
+  PropertyContainer,
+  EmptyInfoPane
 } from "./styles"
 
 interface InfoPaneProps {
@@ -87,13 +88,13 @@ function InfoPanel({features,isLoading}: InfoPaneProps) {
           <Loader/>
       </InfoPaneContainer>
     )
-  } else if (features.length === 0) {
+  } else if (!features || features.length === 0) {
 
     return (
       <InfoPaneContainer>
-        <FeatureTitleContainer>
+        <EmptyInfoPane>
           <p>Nenhuma feição foi selecionada</p>
-        </FeatureTitleContainer>
+        </EmptyInfoPane>
       </InfoPaneContainer>
     )
   } else {

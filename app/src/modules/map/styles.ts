@@ -64,7 +64,7 @@ export const RightSidePanelSwitcher = styled.div`
   width: 10px;
   height: 50px;
   bottom: 62px;
-  margin-left: calc(100% - 12px);
+  margin-left: calc(100% - 14px);
   border: 2px solid rgba(0,0,0,0.2);
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;

@@ -10,6 +10,7 @@ import { generateQueryParams } from '../../utils';
 import { FaCaretLeft, FaCaretRight, FaRulerCombined, FaStreetView } from 'react-icons/fa';
 import { GeoJsonObject } from 'geojson';
 import MapButton from '../../components/mapButton';
+import PanoramicViewer from '../../components/panoramic-viewer';
 
 interface Layer {
   '@_queryable': string;
@@ -26,8 +27,8 @@ function Map() {
   // Info Panel states
   const[displayLeftSidePanel,setdisplayLeftSidePanel] = useState(false)
   const[displayRightSidePanel,setdisplayRightSidePanel] = useState(false)
-  const[features,setFeatures] = useState<GeoJsonObject>()
-  const[isLoadingInfoPanel,setIsLoadingInfoPanel] = useState(true)
+  const[features,setFeatures] = useState()
+  const[isLoadingInfoPanel,setIsLoadingInfoPanel] = useState(false)
 
   useEffect(() => {
 
@@ -171,7 +172,7 @@ function Map() {
         <LeftSidePanelSwitcher onClick={switchLeftPanel}>
             {(displayLeftSidePanel)? (<FaCaretLeft/>) : (<FaCaretRight/> )}
         </LeftSidePanelSwitcher>
-        <SearchBox setFeatures={setFeatures}/>
+        <SearchBox features={features} setFeatures={setFeatures}/>
         <MapContainer 
           center={[-20.25554, -43.80376]} 
           zoom={17} 
@@ -194,7 +195,7 @@ function Map() {
         </RightSidePanelSwitcher>
       </MiddlePanel>
       <RightSidePanel display={displayRightSidePanel}>
-          {/* <Placeholder></Placeholder> */}
+          <PanoramicViewer></PanoramicViewer>
       </RightSidePanel>
     </Container>
   );

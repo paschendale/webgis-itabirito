@@ -4,7 +4,12 @@ import { useForm } from 'react-hook-form';
 import { api } from "../../services/api";
 import { SetStateAction } from "react";
 
-function SearchBox({setFeatures}: { setFeatures: React.Dispatch<React.SetStateAction<any>> }) {
+interface SearchBoxProps { 
+  features: any;
+  setFeatures: React.Dispatch<React.SetStateAction<any>> 
+}
+
+function SearchBox({features,setFeatures}: SearchBoxProps) {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
 
   async function onSubmit(data:any) {
@@ -17,7 +22,7 @@ function SearchBox({setFeatures}: { setFeatures: React.Dispatch<React.SetStateAc
     })
 
     console.log(response.data.features)
-    // setFeatures(response.data.features)
+    setFeatures(response.data.features)
   }
 
   return (
