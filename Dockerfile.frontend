@@ -1,0 +1,16 @@
+FROM node:16 AS builder
+
+WORKDIR /app
+
+COPY ./app .
+
+RUN yarn
+RUN yarn build
+
+FROM nginx:latest
+
+WORKDIR /app/build
+
+COPY --from=builder /app/build .
+
+CMD nginx -g 'daemon off;'

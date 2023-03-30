@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { Switch, Route, BrowserRouter} from "react-router-dom";
 import './index.css';
 import Map from './modules/map'
 // import reportWebVitals from './reportWebVitals';
@@ -10,7 +11,13 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <Map />
+    <BrowserRouter basename='/map'>
+      <Switch>
+        <Route path="/">
+          <Map />
+        </Route>
+      </Switch>
+    </BrowserRouter>
   </React.StrictMode>
 );
 

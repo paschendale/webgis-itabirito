@@ -11,6 +11,7 @@ import { FaCaretLeft, FaCaretRight, FaGithub, FaRulerCombined, FaStreetView } fr
 import { GeoJsonObject } from 'geojson';
 import MapButton from '../../components/mapButton';
 import PanoramicViewer from '../../components/panoramic-viewer';
+import { useLocation } from 'react-router-dom';
 import pj from "./../../../package.json"
 
 interface Layer {
@@ -19,8 +20,11 @@ interface Layer {
 }
 
 function Map() {
+
+  const location = useLocation()
+
   // Project states
-  const[projectId,setProjectId] = useState('7bdc970b4a613172c8a145565cff1014')
+  const[projectId,setProjectId] = useState(location.pathname.split('/')[1])
   const[projectSettings,setProjectSettings] = useState({})
   const[layerOrder,setLayerOrder] = useState<string>('')
   const[layers,setLayers] = useState<Array<Layer>>()

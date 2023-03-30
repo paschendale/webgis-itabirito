@@ -1,0 +1,10 @@
+FROM node:16
+
+WORKDIR /api
+
+COPY ./api /api
+RUN yarn
+
+EXPOSE 3001
+
+CMD yarn start 
