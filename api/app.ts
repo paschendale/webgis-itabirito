@@ -12,5 +12,5 @@ app.use(cors())
 app.use(express.json());
 app.use(routes);
 
-app.listen(3001, () => consoleLog("API inicializada na porta 3001"));
+app.listen(2001, () => consoleLog("API inicializada na porta 2001"));
 

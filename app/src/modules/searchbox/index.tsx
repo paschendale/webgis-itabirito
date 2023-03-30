@@ -16,8 +16,8 @@ function SearchBox({setFeatures}: { setFeatures: React.Dispatch<React.SetStateAc
       keywords: data.searchInput
     })
 
-    console.log(response.data)
-    setFeatures(response.data)
+    console.log(response.data.features)
+    // setFeatures(response.data.features)
   }
 
   return (

@@ -111,7 +111,7 @@ function Map() {
 
     var featureInfo = response.data
 
-    console.log(featureInfo)
+    console.log(featureInfo.features)
 
     setIsLoadingInfoPanel(false)   
     setFeatures(featureInfo.features)
