@@ -98,3 +98,17 @@ export const Placeholder = styled.div`
   height: 100%;
   background-color: red;
 `
+export const Version = styled.div`
+  z-index: 10000;
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(255,255,255,0.5);
+  font-size: xx-small;
+  border-radius: 4px;
+  opacity: 0.5;
+`

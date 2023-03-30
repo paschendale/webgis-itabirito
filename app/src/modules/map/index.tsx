@@ -3,14 +3,15 @@ import 'leaflet/dist/leaflet.css';
 import { useEffect, useState } from "react"
 import SearchBox from '../searchbox';
 import InfoPanel from '../info-panel';
-import { ButtonsContainer, Container, LeftSidePanel, LeftSidePanelSwitcher, MiddlePanel, Placeholder, RightSidePanel, RightSidePanelSwitcher } from './styles';
+import { ButtonsContainer, Container, LeftSidePanel, LeftSidePanelSwitcher, MiddlePanel, Placeholder, RightSidePanel, RightSidePanelSwitcher, Version } from './styles';
 import { api } from '../../services/api';
 import { LeafletMouseEvent } from 'leaflet';
 import { generateQueryParams } from '../../utils';
-import { FaCaretLeft, FaCaretRight, FaRulerCombined, FaStreetView } from 'react-icons/fa';
+import { FaCaretLeft, FaCaretRight, FaGithub, FaRulerCombined, FaStreetView } from 'react-icons/fa';
 import { GeoJsonObject } from 'geojson';
 import MapButton from '../../components/mapButton';
 import PanoramicViewer from '../../components/panoramic-viewer';
+import pj from "./../../../package.json"
 
 interface Layer {
   '@_queryable': string;
@@ -177,6 +178,7 @@ function Map() {
           center={[-20.25554, -43.80376]} 
           zoom={17} 
           scrollWheelZoom={true}
+          attributionControl={false}
           >  
           <GeoJSON 
             key={JSON.stringify(Date.now())} 
@@ -190,6 +192,11 @@ function Map() {
             }
           </>}
         </MapContainer>
+        <Version>
+          <div style={{padding: 4}}>
+            webgis-itabirito:v.{pj.version} <a href='https://github.com/paschendale/webgis-itabirito' target={'_blank'} rel="noreferrer"><FaGithub/> </a>
+          </div>
+        </Version>
         <RightSidePanelSwitcher onClick={switchRightPanel}>
             {(displayRightSidePanel)? (<FaCaretRight/> ) : (<FaCaretLeft/>)}
         </RightSidePanelSwitcher>
