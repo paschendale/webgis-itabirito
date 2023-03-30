@@ -9,6 +9,6 @@ export const pgDatabase: string = process.env.PG_DATABASE!;
 
 export const pgPassword: string = process.env.PG_PASSWORD!;
 
-export const pgPort: string = process.env.PG_PORT!;
+export const pgPort: number = Number(process.env.PG_PORT!);
 
 export const qgisServerUrl: string = process.env.QGIS_SERVER_URL!;

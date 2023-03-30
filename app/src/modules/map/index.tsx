@@ -136,7 +136,7 @@ function Map() {
 
   return ( 
     <Container>
-      <SearchBox/>
+      <SearchBox setFeatures={setFeatures}/>
       <InfoPanel 
         features={features} 
         isLoading={isLoadingInfoPanel}

@@ -2,7 +2,20 @@ import * as Environments from "../environments";
 import { consoleLog } from "../utils"
 import { Client } from "pg"
 
-export function connection () {
+	// Grants para a base de dados no usuário WebGIS
+
+	// CREATE USER webgis WITH PASSWORD 'asnd9a0s' LOGIN;
+
+	// CREATE SCHEMA IF NOT EXISTS webgis;
+
+	// GRANT SELECT ON ALL TABLES IN SCHEMA webgis TO webgis;
+	// GRANT USAGE ON ALL TABLES IN SCHEMA webgis TO webgis;
+
+	// ALTER DEFAULT PRIVILEGES FOR ROLE webgis IN SCHEMA webgis GRANT SELECT ON TABLES TO webgis;
+	// ALTER DEFAULT PRIVILEGES FOR ROLE webgis IN SCHEMA webgis GRANT USAGE ON SEQUENCES TO webgis;
+
+
+export default function connection () {
 
 	const client = new Client({
 		user: Environments.pgUser,
