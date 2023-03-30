@@ -3,17 +3,21 @@ import { LoaderContainer } from "./styles"
 
 export default function Loader() {
   return (
-    <LoaderContainer>
-      <ContentLoader 
-        speed={1}
-        width={300}
-        height={80}
-        backgroundColor="#cccccc"
-        foregroundColor="#e0e0e0"
-      >
-        <rect x="10" y="40" rx="3" ry="3" width="180" height="10" /> 
-        <rect x="10" y="65" rx="3" ry="3" width="250" height="10" /> 
-      </ContentLoader>
-    </LoaderContainer>
+    <ContentLoader 
+      speed={1}
+      height={640}
+      width={320}
+      backgroundColor="#cccccc"
+      foregroundColor="#e0e0e0"
+    >
+      <rect x="10" y="10" width="330" height="80"/> 
+      <rect x="10" y="100" width="330" height="80" /> 
+      <rect x="10" y="190" width="330" height="80" /> 
+      <rect x="10" y="280" width="330" height="80" /> 
+      <rect x="10" y="370" width="330" height="80" /> 
+      <rect x="10" y="460" width="330" height="80" /> 
+      <rect x="10" y="550" width="330" height="80" /> 
+      <rect x="10" y="640" width="330" height="80" /> 
+    </ContentLoader>
   )
 }

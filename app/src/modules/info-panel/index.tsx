@@ -15,7 +15,6 @@ import {
 interface InfoPaneProps {
   features: any | undefined;
   isLoading: boolean;
-  display: boolean;
 }
 
 interface FeatureContainerProps {
@@ -79,14 +78,9 @@ function FeatureContainer({feature,index}: FeatureContainerProps) {
   )
 }
 
-function InfoPanel({features,isLoading,display}: InfoPaneProps) {
+function InfoPanel({features,isLoading}: InfoPaneProps) {
 
-  if (!display) {
-
-    return (
-      <></>
-    )
-  } else if (isLoading) {
+  if (isLoading) {
 
     return (
       <InfoPaneContainer>

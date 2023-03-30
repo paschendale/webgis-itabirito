@@ -1,12 +1,15 @@
-import { MapContainer, useMapEvents, WMSTileLayer } from 'react-leaflet'
+import { MapContainer, useMapEvents, WMSTileLayer, GeoJSON } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import { useEffect, useState } from "react"
 import SearchBox from '../searchbox';
 import InfoPanel from '../info-panel';
-import { Container } from './styles';
+import { ButtonsContainer, Container, LeftSidePanel, LeftSidePanelSwitcher, MiddlePanel, Placeholder, RightSidePanel, RightSidePanelSwitcher } from './styles';
 import { api } from '../../services/api';
 import { LeafletMouseEvent } from 'leaflet';
 import { generateQueryParams } from '../../utils';
+import { FaCaretLeft, FaCaretRight, FaRulerCombined, FaStreetView } from 'react-icons/fa';
+import { GeoJsonObject } from 'geojson';
+import MapButton from '../../components/mapButton';
 
 interface Layer {
   '@_queryable': string;
@@ -21,8 +24,9 @@ function Map() {
   const[layers,setLayers] = useState<Array<Layer>>()
 
   // Info Panel states
-  const[displayInfoPanel,setDisplayInfoPanel] = useState(false)
-  const[features,setFeatures] = useState([])
+  const[displayLeftSidePanel,setdisplayLeftSidePanel] = useState(false)
+  const[displayRightSidePanel,setdisplayRightSidePanel] = useState(false)
+  const[features,setFeatures] = useState<GeoJsonObject>()
   const[isLoadingInfoPanel,setIsLoadingInfoPanel] = useState(true)
 
   useEffect(() => {
@@ -39,7 +43,6 @@ function Map() {
     getProjectSettings()
     .then(settings => {
 
-      console.log(settings)
       setLayerOrder(settings.layerDrawingOrder)
       setLayers(settings.layers.Layer)
       setProjectSettings(settings)
@@ -111,11 +114,27 @@ function Map() {
 
     var featureInfo = response.data
 
-    console.log(featureInfo.features)
-
     setIsLoadingInfoPanel(false)   
     setFeatures(featureInfo.features)
     return featureInfo
+  }
+
+  function switchLeftPanel() {
+
+    setdisplayLeftSidePanel(!displayLeftSidePanel)
+  }
+
+  function switchRightPanel() {
+
+    setdisplayRightSidePanel(!displayRightSidePanel)
+  }
+
+  function measureTool(e: any) {
+    console.log('mediremos em breve')
+  }
+
+  function streetView(e: any) {
+    console.log('veremos em breve')
   }
 
   const MapHandlers = () => {
@@ -123,8 +142,8 @@ function Map() {
     useMapEvents({
         click(e) {
 
-          if(!displayInfoPanel) {
-            setDisplayInfoPanel(true)
+          if(!displayLeftSidePanel) {
+            setdisplayLeftSidePanel(true)
           }
           setIsLoadingInfoPanel(true) 
           getFeatureInfo(this,e)
@@ -136,24 +155,47 @@ function Map() {
 
   return ( 
     <Container>
-      <SearchBox setFeatures={setFeatures}/>
-      <InfoPanel 
-        features={features} 
-        isLoading={isLoadingInfoPanel}
-        display={displayInfoPanel}
-      />
-      <MapContainer 
-        center={[-20.25554, -43.80376]} 
-        zoom={17} 
-        scrollWheelZoom={true}
-        >        
-        <MapHandlers/>
-        {layers && <>
-          {
-            makeLayers(layers,layerOrder)
-          }
-        </>}
-      </MapContainer>
+      <LeftSidePanel display={displayLeftSidePanel}>
+        <InfoPanel 
+          features={features} 
+          isLoading={isLoadingInfoPanel}
+        />
+      </LeftSidePanel>
+      <MiddlePanel>
+        <ButtonsContainer>
+          <MapButton onClick={measureTool}><FaRulerCombined/></MapButton>
+          <MapButton onClick={streetView}>
+            <FaStreetView />
+          </MapButton>
+        </ButtonsContainer>
+        <LeftSidePanelSwitcher onClick={switchLeftPanel}>
+            {(displayLeftSidePanel)? (<FaCaretLeft/>) : (<FaCaretRight/> )}
+        </LeftSidePanelSwitcher>
+        <SearchBox setFeatures={setFeatures}/>
+        <MapContainer 
+          center={[-20.25554, -43.80376]} 
+          zoom={17} 
+          scrollWheelZoom={true}
+          >  
+          <GeoJSON 
+            key={JSON.stringify(Date.now())} 
+            data={features!} 
+            style={{color: 'red'}}
+          />    
+          <MapHandlers/>
+          {layers && <>
+            {
+              makeLayers(layers,layerOrder)
+            }
+          </>}
+        </MapContainer>
+        <RightSidePanelSwitcher onClick={switchRightPanel}>
+            {(displayRightSidePanel)? (<FaCaretRight/> ) : (<FaCaretLeft/>)}
+        </RightSidePanelSwitcher>
+      </MiddlePanel>
+      <RightSidePanel display={displayRightSidePanel}>
+          {/* <Placeholder></Placeholder> */}
+      </RightSidePanel>
     </Container>
   );
 }

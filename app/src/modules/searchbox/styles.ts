@@ -9,8 +9,11 @@ export const SearchBoxContainer = styled.div`
   margin: 10px;
   margin-left: 50px;
   border-radius: 4px;
-  border: 2px solid rgba(0,0,0,0.2);
+  border: 1px solid rgba(0,0,0,0.2);
   display: flex;
+  box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.5);
+  -webkit-box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.5);
+  -moz-box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.5);
 `;
 
 export const SearchInput = styled.input`

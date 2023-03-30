@@ -2,17 +2,13 @@ import styled from "styled-components";
 
 export const InfoPaneContainer = styled.div`
   display: auto;
-  width: 300px;
-  max-height: calc(100vh - 100px);
+  width: 330px;
+  height: 100vh;
+  max-height: 100vh;
   background-color: whitesmoke;
-  position: absolute;
   z-index: 1000;
-  margin: 10px;
-  margin-top: 80px;
-  margin-left: 50px;
-  border-radius: 4px;
-  border: 2px solid rgba(0,0,0,0.2);
   overflow-y: auto;
+  overflow-x: hidden;
   pointer-events: all !important;
 `;
 
@@ -21,8 +17,9 @@ interface FeatureTitleContainerProps {
 }
 
 export const FeatureTitleContainer = styled.div<FeatureTitleContainerProps>`
-  background-image: url('http://via.placeholder.com/300x80/000000?text=nothing to see here');
+  background-image: url('http://via.placeholder.com/280x80/000000?text=nothing to see here');
   width: 100%;
+  max-width: 320px;
   min-height: 80px;
   margin-bottom: 5px;
   display: flex;
@@ -30,10 +27,12 @@ export const FeatureTitleContainer = styled.div<FeatureTitleContainerProps>`
   justify-content: flex-end;
   cursor: pointer;
   transition: all 0.5s;
+  margin-left: 5px;
+  margin-right: 5px;
 
   &:hover {
     height: 120px;
-    background-image: url('http://via.placeholder.com/300x120/000000?text=nothing to see here');
+    background-image: url('http://via.placeholder.com/280x120/000000?text=nothing to see here');
   }
 `
 
