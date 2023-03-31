@@ -12,8 +12,6 @@ services:
     image: paschendale/webgis-itabirito-frontend:latest
     container_name: webgis-frontend
     hostname: webgis-frontend
-    ports:
-      - 90:80
 
   webgis-backend:
     image: paschendale/webgis-itabirito-backend:latest
