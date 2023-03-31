@@ -24,7 +24,7 @@ function Map() {
   const location = useLocation()
 
   // Project states
-  const[projectId,setProjectId] = useState(location.pathname.split('/')[1])
+  const[projectId,setProjectId] = useState(location.pathname.split('/map/')[1])
   const[projectSettings,setProjectSettings] = useState({})
   const[layerOrder,setLayerOrder] = useState<string>('')
   const[layers,setLayers] = useState<Array<Layer>>()

@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Switch, Route, BrowserRouter} from "react-router-dom";
+import { Switch, Route, BrowserRouter, Redirect} from "react-router-dom";
 import './index.css';
 import Map from './modules/map'
+import Geoportal from './pages/geoportal';
 // import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(
@@ -11,9 +12,15 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <BrowserRouter basename='/map'>
+    <BrowserRouter basename='/'>
       <Switch>
-        <Route path="/">
+        <Route exact path="/">
+          <Redirect to="/geoportal"/>
+        </Route>
+        <Route path="/geoportal">
+          <Geoportal/>
+        </Route>
+        <Route path="/map">
           <Map />
         </Route>
       </Switch>
