@@ -5,6 +5,6 @@ WORKDIR /api
 COPY ./api /api
 RUN yarn
 
-EXPOSE 3001
+EXPOSE 2001
 
 CMD yarn start 
