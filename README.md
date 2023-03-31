@@ -1,10 +1,10 @@
 # WebGIS - Itabirito
 
-O projeto WebGIS - Itabirito é uma solução de mapas na web desenvolvida em React e Typescript e com conexão ao QGIS Server. Este repositório não contem uma orquestração da aplicação com o QGIS Server, mas recomendamos imagens Dcoker como o (camptocamp/qgis-server)[https://hub.docker.com/r/camptocamp/qgis-server].
+O projeto WebGIS - Itabirito é uma solução de mapas na web desenvolvida em React e Typescript e com conexão ao QGIS Server. Este repositório não contem uma orquestração da aplicação com o QGIS Server, mas recomendo imagens Docker como o [camptocamp/qgis-server](https://hub.docker.com/r/camptocamp/qgis-server).
 
 # Inicializando a aplicação em ambiente de desenvolvimento
 
-O ambiente de produção da aplicação utiliza Node.js. Sendo assim, certifique-se de que seu computador possui baixado e instalado o (Node.js)[https://nodejs.org/en]. Na época de desenvolvimento desta aplicação, foi utilizada a versão 18 do Node.js
+O ambiente de produção da aplicação utiliza Node.js. Sendo assim, certifique-se de que seu computador possui baixado e instalado o [Node.js](https://nodejs.org/en). Na época de desenvolvimento desta aplicação, foi utilizada a versão 18 do Node.js
 
 Uma vez instalado o Node.js e clonado o repositório, execute os seguintes comandos para instalar as dependencias da aplicação:
 
