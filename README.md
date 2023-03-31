@@ -30,7 +30,11 @@ A disponibilização da aplicação em ambiente de produção é realizada atrav
 
 # Personalizando a aplicação 
 
-Para personalizar a aplicaçao crie um fork deste repositório e realize as alterações que deseja. Em seguida, crie um arquivo `docker-compose.my-custom-image.yml` e copie o conteúdo do arquivo `docker-compose.yml` deste repostiório. Substitua os nomes das imagens `paschendale/webgis-itabirito-frontend:latest` e `paschendale/webgis-itabirito-backend:latest` por `paschendale/my-custom-image-frontend:latest`, ou qualquer outro nome que preferir, e rode o seguinte comando para inicializar a orquestração em Docker:
+Para personalizar a aplicaçao crie um fork deste repositório e realize as alterações que deseja. 
+
+Em seguida, crie um arquivo `docker-compose.my-custom-image.yml` e copie o conteúdo do arquivo `docker-compose.yml` deste repostiório. 
+
+Substitua os nomes das imagens `paschendale/webgis-itabirito-frontend:latest` e `paschendale/webgis-itabirito-backend:latest` por `paschendale/my-custom-image-frontend:latest`, ou qualquer outro nome que preferir, e rode o seguinte comando para inicializar a orquestração em Docker:
 
 ```
   docker-compose up --build
