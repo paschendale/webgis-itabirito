@@ -11,6 +11,7 @@ services:
   webgis-frontend:
     image: paschendale/webgis-itabirito-frontend:latest
     container_name: webgis-frontend
+    hostname: webgis-frontend
     build:
       context: .
       dockerfile: Dockerfile.frontend
@@ -37,4 +38,4 @@ services:
     container_name: webgis-watchtower
     volumes:
       - //var/run/docker.sock:/var/run/docker.sock
-    command: --interval 30 webgis-frontend webgis-backend
+    command: --interval 300 webgis-frontend webgis-backend
