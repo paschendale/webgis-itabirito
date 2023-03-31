@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  webgis-proxy:
+    image: nginx
+    volumes:
+      - './proxy/proxy.conf:/etc/nginx/conf.d/default.conf'
+    ports:
+      - 80:80
+
+  webgis-frontend:
+    image: paschendale/webgis-itabirito-frontend:latest
+    container_name: webgis-frontend
+    hostname: webgis-frontend
+    ports:
+      - 90:80
+
+  webgis-backend:
+    image: paschendale/webgis-itabirito-backend:latest
+    container_name: webgis-backend
+    hostname: webgis-backend
+    environment:
+      - PG_DATABASE=
+      - PG_USER=
+      - PG_HOST=
+      - PG_PASSWORD=
+      - PG_PORT=
+      - QGIS_SERVER_URL=
+
+  webgis-watchtower:
+    image: containrrr/watchtower
+    container_name: webgis-watchtower
+    volumes:
+      - //var/run/docker.sock:/var/run/docker.sock
+    command: --interval 300 webgis-frontend webgis-backend
