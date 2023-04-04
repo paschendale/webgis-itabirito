@@ -1,5 +1,6 @@
 import { MapContainer, useMapEvents, WMSTileLayer, GeoJSON } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
+import './styles.css'
 import { useEffect, useState } from "react"
 import SearchBox from '../searchbox';
 import InfoPanel from '../info-panel';
@@ -198,7 +199,7 @@ function Map() {
         </MapContainer>
         <Version>
           <div style={{padding: 4}}>
-            webgis-itabirito:v.{pj.version} <a href='https://github.com/paschendale/webgis-itabirito' target={'_blank'} rel="noreferrer"><FaGithub/> </a>
+            webgis-itabirito:v.{pj.version} <a style={{color: 'inherit'}} href='https://github.com/paschendale/webgis-itabirito' target={'_blank'} rel="noreferrer"><span style={{color: 'inherit'}}><FaGithub/></span></a>
           </div>
         </Version>
         <RightSidePanelSwitcher onClick={switchRightPanel}>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { api } from "../../services/api"
-import { GeoportalContainer, GeoportalViewport, Navbar, NavbarBrand, ServicesContainer, ServicesTitleContainer, NavbarLogo } from "./styles"
+import { GeoportalContainer, GeoportalViewport, Navbar, NavbarBrand, ServicesContainer, ServicesTitleContainer, NavbarLogo, NavbarTitle } from "./styles"
 import ServiceCard from "../../components/serviceCard"
 import brasao from "./../../assets/brasao.png"
 
@@ -30,7 +30,9 @@ export default function Geoportal() {
       <Navbar>
         <NavbarBrand href="/geoportal">
           <NavbarLogo src={brasao} alt="Logo da prefeitura" />
-          &nbsp; PREFEITURA DE &nbsp; <b> ITABIRITO</b> &nbsp; | &nbsp;GEOPORTAL
+          <NavbarTitle>
+            &nbsp; PREFEITURA DE <b> ITABIRITO</b> | GEOPORTAL
+          </NavbarTitle>
         </NavbarBrand>
       </Navbar>
       <GeoportalContainer>

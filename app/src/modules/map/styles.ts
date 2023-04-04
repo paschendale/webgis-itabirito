@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import denim from "./../../assets/denim.webp";
 
 export const Container = styled.div`
   width: 100%;
@@ -30,6 +31,11 @@ export const RightSidePanel = styled.div<PanelProps>`
   box-shadow: -6px 2px 5px 0px rgba(0,0,0,0.5);
   -webkit-box-shadow: -6px 2px 5px 0px rgba(0,0,0,0.5);
   -moz-box-shadow: -6px 2px 5px 0px rgba(0,0,0,0.5);
+
+  @media (prefers-color-scheme: dark) {
+    color: rgb(180,180,180);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.50), rgba(0, 0, 0, 0.50)), url(${denim});
+  }
 `;
 
 export const MiddlePanel = styled.div`
@@ -42,10 +48,10 @@ export const LeftSidePanelSwitcher = styled.div`
   cursor: pointer;
   z-index: 1000;
   position: absolute;
-  width: 10px;
+  width: 14px;
   height: 50px;
   bottom: 10px;
-  border: 2px solid rgba(0,0,0,0.2);
+  border: none;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   box-shadow: 6px 2px 5px 0px rgba(0,0,0,0.5);
@@ -55,17 +61,23 @@ export const LeftSidePanelSwitcher = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  @media (prefers-color-scheme: dark) {
+    color: rgb(180,180,180);
+    border: none;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.50), rgba(0, 0, 0, 0.50)), url(${denim});
+  }
 `;
 
 export const RightSidePanelSwitcher = styled.div`
   cursor: pointer;
   z-index: 1000;
   position: relative;
-  width: 10px;
+  width: 14px;
   height: 50px;
   bottom: 62px;
   margin-left: calc(100% - 14px);
-  border: 2px solid rgba(0,0,0,0.2);
+  border: none;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
   box-shadow: -6px 2px 5px 0px rgba(0,0,0,0.5);
@@ -75,6 +87,11 @@ export const RightSidePanelSwitcher = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  @media (prefers-color-scheme: dark) {
+    color: rgb(180,180,180);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.50), rgba(0, 0, 0, 0.50)), url(${denim});
+  }
 `;
 
 export const ButtonsContainer = styled.div`
@@ -91,6 +108,11 @@ export const ButtonsContainer = styled.div`
   -webkit-box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.5);
   -moz-box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.5);
   border-radius: 4px;
+
+  @media (prefers-color-scheme: dark) {
+    color: rgb(180,180,180);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.50), rgba(0, 0, 0, 0.50)), url(${denim});
+  }
 `;
 
 export const Placeholder = styled.div`
@@ -110,5 +132,10 @@ export const Version = styled.div`
   background-color: rgb(255,255,255,0.5);
   font-size: xx-small;
   border-radius: 4px;
-  opacity: 0.5;
+  opacity: 0.5;  
+  
+  @media (prefers-color-scheme: dark) {
+    color: rgb(180,180,180);
+    background-color: rgb(0,0,0,0.8);
+  }
 `

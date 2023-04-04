@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import denim from "./../../assets/denim.webp"
 
 export const InfoPaneContainer = styled.div`
   display: auto;
@@ -10,6 +11,11 @@ export const InfoPaneContainer = styled.div`
   overflow-y: auto;
   overflow-x: hidden;
   pointer-events: all !important;
+
+  @media (prefers-color-scheme: dark) {
+    color: rgb(180,180,180);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.50), rgba(0, 0, 0, 0.50)), url(${denim});
+  }
 `;
 
 interface FeatureTitleContainerProps {
@@ -51,6 +57,13 @@ export const FeatureId = styled.h3`
 `
 
 export const FeatureAttributesContainer = styled.div`
+  margin-left: 5px;
+  width: 320px;
+
+  @media (prefers-color-scheme: dark) {
+    color: rgb(180,180,180);
+    background-color: rgb(60, 60, 60);
+  }
 `
 
 export const PropertyContainer = styled.div`
@@ -74,4 +87,5 @@ export const EmptyInfoPane = styled.div`
   height: 100%;
   align-items: center;
   justify-content: center;
+  color: inherit;
 `;
