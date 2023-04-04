@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import background from "./../../assets/background-osm.png"
+import denim from "./../../assets/denim.webp";
 
 export const GeoportalContainer = styled.div`
   background-color: whitesmoke;
@@ -11,6 +12,11 @@ export const GeoportalContainer = styled.div`
 
   @media (max-width: 768px) {
     min-height: calc(100vh - 50px);
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    color: rgb(180,180,180);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url(${denim});
   }
 `;
 
@@ -27,6 +33,12 @@ export const GeoportalViewport = styled.div`
 
   @media (max-width: 768px) {
     min-height: calc(100vh - 50px);
+  }
+
+  
+  @media (prefers-color-scheme: dark) {
+    color: rgb(180,180,180);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4)), url(${denim});
   }
 `;
 
@@ -46,6 +58,11 @@ export const ServicesContainer = styled.div`
   @media (max-width: 768px) {
     flex-direction: row;
     justify-content: center;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    color: rgb(180,180,180);
+    background-color: rgb(100,100,100,0.2);
   }
 `;
 
@@ -71,6 +88,11 @@ export const Navbar = styled.div`
     height: 50px;
     margin: 0;
   }
+  
+  @media (prefers-color-scheme: dark) {
+    color: rgb(180,180,180);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.40), rgba(0, 0, 0, 0.40)), url(${denim});
+  }
 `
 
 export const NavbarBrand = styled.a`
@@ -79,6 +101,11 @@ export const NavbarBrand = styled.a`
   flex-direction: row;
   align-items: center;
   text-decoration: none;
+`
+
+export const NavbarTitle = styled.h3`
+  color: rgb(180,180,180);
+  font-weight: normal;
 `
 
 export const NavbarLogo = styled.img`

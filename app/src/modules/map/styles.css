@@ -1,0 +1,16 @@
+@media (prefers-color-scheme: dark) {
+
+  .leaflet-bar a {
+    color: rgb(180,180,180);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.50), rgba(0, 0, 0, 0.50)), url('./../../assets/denim.webp');
+  }
+
+  .leaflet-container a {
+    -webkit-tap-highlight-color: black;
+  }
+
+  .leaflet-control-zoom-in {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.6) !important;
+  }
+}
+

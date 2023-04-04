@@ -23,6 +23,12 @@ export const ServiceCardContainer = styled.div`
     height: 120px;
     width: 120px;
   }
+
+  @media (prefers-color-scheme: dark) {
+    color: rgb(180,180,180);
+    background-color: inherit;
+    border-color: transparent;
+  }
 `;
 
 export const Card = styled.div`
