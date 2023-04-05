@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import denim from "./../../assets/denim.webp"
+import featurePlaceholder from "./../../assets/feature-placeholder.png"
 
 export const InfoPaneContainer = styled.div`
   display: auto;
@@ -23,7 +24,8 @@ interface FeatureTitleContainerProps {
 }
 
 export const FeatureTitleContainer = styled.div<FeatureTitleContainerProps>`
-  background-image: url('http://via.placeholder.com/280x80/000000?text=nothing to see here');
+  background-image: url(${featurePlaceholder});
+  background-size: 110%;
   width: 100%;
   max-width: 320px;
   min-height: 80px;
@@ -38,7 +40,8 @@ export const FeatureTitleContainer = styled.div<FeatureTitleContainerProps>`
 
   &:hover {
     height: 120px;
-    background-image: url('http://via.placeholder.com/280x120/000000?text=nothing to see here');
+    background-image: url(${featurePlaceholder});
+    background-size: 110%;
   }
 `
 

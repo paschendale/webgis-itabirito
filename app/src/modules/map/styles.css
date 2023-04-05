@@ -9,6 +9,10 @@
     -webkit-tap-highlight-color: black;
   }
 
+  .leaflet-container{
+    background-image: linear-gradient(rgba(0, 0, 0, 0.70), rgba(0, 0, 0, 0.70)), url('./../../assets/denim.webp');
+  }
+
   .leaflet-control-zoom-in {
     border-bottom: 1px solid rgba(0, 0, 0, 0.6) !important;
   }
