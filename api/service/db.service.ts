@@ -26,6 +26,12 @@ export async function searchService(keywords: string, layers: Array<string>) {
 
   for await (var search of searchSchema) {
 
+    if(!search.search_body) {
+
+      consoleLog(`db: Tabela ${search.table_name} não possui campo pesquisável em formato de texto`)
+      continue;
+    }
+
     var searchBody = `COALESCE("` + search.search_body.join(`",'')  || ' '::text ||  COALESCE("`) + `",'')`
 
     let searchQuery = `
