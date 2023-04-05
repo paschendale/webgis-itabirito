@@ -55,12 +55,16 @@ function FeatureContainer({feature,index}: FeatureContainerProps) {
     return attributesArray;
   }
 
+  var featureId = feature.id.split('.')
+  var featurePk = featureId.pop()
+  var featureTitle = featureId.join('.')
+
   return (
     <>
       <FeatureTitleContainer key={index} onClick={() => setOpen(!open)}>
         <TextArea>
-          <FeatureTitle>{feature.id.split('.')[0]}</FeatureTitle>
-          <FeatureId>{feature.id.split('.')[1]}</FeatureId>
+          <FeatureTitle>{featureTitle}</FeatureTitle>
+          <FeatureId>{featurePk}</FeatureId>
         </TextArea>
         <ButtonArea>
           <EachButton>
