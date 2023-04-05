@@ -64,10 +64,10 @@ function FeatureContainer({feature,index}: FeatureContainerProps) {
         </TextArea>
         <ButtonArea>
           <EachButton>
-            <FaMapMarkerAlt size={25} onClick={() => console.log(`i'm clicked`)}/>
+            <FaFilePdf size={25} onClick={() => console.log(`i'm clicked`)}/>
           </EachButton>
           <EachButton>
-            <FaFilePdf size={25} onClick={() => console.log(`i'm clicked`)}/>
+            <FaMapMarkerAlt size={25} onClick={() => console.log(`i'm clicked`)}/>
           </EachButton>
         </ButtonArea>
       </FeatureTitleContainer>

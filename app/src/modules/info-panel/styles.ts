@@ -55,7 +55,11 @@ export const ButtonArea = styled.div`
   display: flex;
   flex-direction: row;
   color: white;
-  margin-right: 10px;
+  margin-right: 10px;  
+  
+  @media (prefers-color-scheme: dark) {
+    color: rgb(180,180,180);
+  }
 `
 
 export const EachButton = styled.div`
@@ -64,6 +68,7 @@ export const EachButton = styled.div`
   transition: all 0.2s;
 
   &:hover {
+    color: white;
     scale: 1.1;
   }
 `
@@ -84,6 +89,7 @@ export const FeatureId = styled.h3`
 
 export const FeatureAttributesContainer = styled.div`
   margin-left: 5px;
+  margin-bottom: 5px;
   width: 320px;
 
   @media (prefers-color-scheme: dark) {
