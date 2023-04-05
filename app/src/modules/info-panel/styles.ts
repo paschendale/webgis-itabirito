@@ -47,8 +47,12 @@ export const FeatureTitleContainer = styled.div<FeatureTitleContainerProps>`
 `
 
 export const TextArea = styled.div`
+  max-width: 70%;
   display: flex;
+  white-space: nowrap;
+  overflow: hidden;
   flex-direction: column;
+  text-overflow: ellipsis;
 `
 
 export const ButtonArea = styled.div`
