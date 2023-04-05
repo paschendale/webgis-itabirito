@@ -5,15 +5,16 @@ import { api } from "../../services/api";
 import { SetStateAction } from "react";
 
 interface SearchBoxProps { 
-  features: any;
-  setFeatures: React.Dispatch<React.SetStateAction<any>> 
+  setFeatures: React.Dispatch<React.SetStateAction<any>>;
+  setLoading: React.Dispatch<React.SetStateAction<any>>;
 }
 
-function SearchBox({features,setFeatures}: SearchBoxProps) {
+function SearchBox({setFeatures,setLoading}: SearchBoxProps) {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
 
   async function onSubmit(data:any) {
     
+    setLoading(true)
     console.log(data) 
 
     const response = await api.post('/search',
@@ -21,7 +22,8 @@ function SearchBox({features,setFeatures}: SearchBoxProps) {
       keywords: data.searchInput
     })
 
-    console.log(response.data.features)
+    
+    setLoading(false)
     setFeatures(response.data.features)
   }
 

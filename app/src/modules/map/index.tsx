@@ -20,6 +20,14 @@ interface Layer {
   Name: string,
 }
 
+interface Feature {
+  bbox?: Array<number>;
+  geometry: any;
+  id: string;
+  properties: any;
+  type: string;
+}
+
 function Map() {
 
   const location = useLocation()
@@ -33,7 +41,7 @@ function Map() {
   // Info Panel states
   const[displayLeftSidePanel,setdisplayLeftSidePanel] = useState(false)
   const[displayRightSidePanel,setdisplayRightSidePanel] = useState(false)
-  const[features,setFeatures] = useState()
+  const[features,setFeatures] = useState<Feature>()
   const[isLoadingInfoPanel,setIsLoadingInfoPanel] = useState(false)
 
   useEffect(() => {
@@ -121,6 +129,7 @@ function Map() {
 
     var featureInfo = response.data
 
+    console.log("🚀 ~ file: index.tsx:137 ~ getFeatureInfo ~ featureInfo.features:", featureInfo.features)
     setIsLoadingInfoPanel(false)   
     setFeatures(featureInfo.features)
     return featureInfo
@@ -178,18 +187,21 @@ function Map() {
         <LeftSidePanelSwitcher onClick={switchLeftPanel}>
             {(displayLeftSidePanel)? (<FaCaretLeft/>) : (<FaCaretRight/> )}
         </LeftSidePanelSwitcher>
-        <SearchBox features={features} setFeatures={setFeatures}/>
+        <SearchBox 
+          setFeatures={setFeatures}
+          setLoading={setIsLoadingInfoPanel}
+        />
         <MapContainer 
           center={[-20.25554, -43.80376]} 
           zoom={17} 
           scrollWheelZoom={true}
           attributionControl={false}
           >  
-          <GeoJSON 
+          {/* <GeoJSON 
             key={JSON.stringify(Date.now())} 
             data={features!} 
             style={{color: 'red'}}
-          />    
+          />     */}
           <MapHandlers/>
           {layers && <>
             {

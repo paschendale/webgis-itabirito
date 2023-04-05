@@ -44,7 +44,7 @@ function FeatureContainer({feature,index}: FeatureContainerProps) {
       
       attributesArray.push({
         key: Object.keys(object)[index],
-        value: Object.values(object)[index]
+        value: (typeof(Object.values(object)[index]) === 'object') ? JSON.stringify(Object.values(object)[index]) : Object.values(object)[index]
       })
     }
 
@@ -80,7 +80,7 @@ function FeatureContainer({feature,index}: FeatureContainerProps) {
 }
 
 function InfoPanel({features,isLoading}: InfoPaneProps) {
-
+  
   if (isLoading) {
 
     return (
@@ -104,6 +104,7 @@ function InfoPanel({features,isLoading}: InfoPaneProps) {
         {
           features.map((e: any, i: number) => {
 
+            console.log(e)
             return (
               <FeatureContainer key={i} feature={e} index={i}/>
             )
