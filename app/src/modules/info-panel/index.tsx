@@ -10,8 +10,12 @@ import {
   PropertyName,
   PropertyValue,
   PropertyContainer,
-  EmptyInfoPane
+  EmptyInfoPane,
+  TextArea,
+  ButtonArea,
+  EachButton
 } from "./styles"
+import { FaFilePdf, FaLocationArrow, FaMapMarkerAlt } from 'react-icons/fa';
 
 interface InfoPaneProps {
   features: any | undefined;
@@ -54,8 +58,18 @@ function FeatureContainer({feature,index}: FeatureContainerProps) {
   return (
     <>
       <FeatureTitleContainer key={index} onClick={() => setOpen(!open)}>
-        <FeatureTitle>{feature.id.split('.')[0]}</FeatureTitle>
-        <FeatureId>{feature.id.split('.')[1]}</FeatureId>
+        <TextArea>
+          <FeatureTitle>{feature.id.split('.')[0]}</FeatureTitle>
+          <FeatureId>{feature.id.split('.')[1]}</FeatureId>
+        </TextArea>
+        <ButtonArea>
+          <EachButton>
+            <FaMapMarkerAlt size={25} onClick={() => console.log(`i'm clicked`)}/>
+          </EachButton>
+          <EachButton>
+            <FaFilePdf size={25} onClick={() => console.log(`i'm clicked`)}/>
+          </EachButton>
+        </ButtonArea>
       </FeatureTitleContainer>
       <Collapsible trigger={''} open={open}>
       <FeatureAttributesContainer> 
