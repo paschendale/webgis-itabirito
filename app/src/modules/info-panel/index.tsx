@@ -61,16 +61,22 @@ function FeatureContainer({feature,index}: FeatureContainerProps) {
       <FeatureAttributesContainer> 
         {
           attributesToArray(feature.properties).map((e: any, i: number) => {
-            return (
-              <PropertyContainer key={i}>
-                <PropertyName>
-                  {e.key}
-                </PropertyName>
-                <PropertyValue>
-                  {e.value}
-                </PropertyValue>
-              </PropertyContainer>
-            )
+
+            if (e.key !== 'geom') {
+              return (
+                <PropertyContainer key={i}>
+                  <PropertyName>
+                    {e.key}
+                  </PropertyName>
+                  <PropertyValue>
+                    {e.value}
+                  </PropertyValue>
+                </PropertyContainer>
+              )
+            } else {
+              
+              return null
+            }
           })
         }
       </FeatureAttributesContainer>
