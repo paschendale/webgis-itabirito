@@ -1,23 +1,23 @@
 version: '3'
 
 services:
-  webgis-proxy:
+  webgis-proxy-staging:
     image: nginx
     volumes:
       - './proxy/proxy.conf:/etc/nginx/conf.d/default.conf'
     ports:
       - 110:80
 
-  webgis-frontend:
+  webgis-frontend-staging:
     image: paschendale/webgis-itabirito-frontend:latest
-    container_name: webgis-frontend
+    container_name: webgis-frontend-staging
     hostname: webgis-frontend
     labels:
       - "com.centurylinklabs.watchtower.scope=webgis.itabirito.staging"
 
-  webgis-backend:
+  webgis-backend-staging:
     image: paschendale/webgis-itabirito-backend:latest
-    container_name: webgis-backend
+    container_name: webgis-backend-staging
     hostname: webgis-backend
     environment:
       - PG_DATABASE=itabirito
@@ -29,9 +29,9 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.scope=webgis.itabirito.staging"
 
-  webgis-watchtower:
+  webgis-watchtower-staging:
     image: containrrr/watchtower
-    container_name: webgis-watchtower
+    container_name: webgis-watchtower-staging
     volumes:
       - //var/run/docker.sock:/var/run/docker.sock
     command: --interval 300 webgis-frontend webgis-backend --scope webgis.itabirito.staging
