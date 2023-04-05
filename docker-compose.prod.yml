@@ -20,6 +20,11 @@ services:
     container_name: webgis-backend
     hostname: webgis-backend
     environment:
+      - PG_DATABASE=
+      - PG_USER=
+      - PG_HOST=
+      - PG_PASSWORD=
+      - PG_PORT=
       - QGIS_SERVER_URL=https://qgis.itabirito.genteufv.com.br/
     labels:
       - "com.centurylinklabs.watchtower.scope=webgis.itabirito"
