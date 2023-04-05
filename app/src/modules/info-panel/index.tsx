@@ -104,7 +104,6 @@ function InfoPanel({features,isLoading}: InfoPaneProps) {
         {
           features.map((e: any, i: number) => {
 
-            console.log(e)
             return (
               <FeatureContainer key={i} feature={e} index={i}/>
             )

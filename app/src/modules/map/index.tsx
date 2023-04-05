@@ -129,7 +129,6 @@ function Map() {
 
     var featureInfo = response.data
 
-    console.log("🚀 ~ file: index.tsx:137 ~ getFeatureInfo ~ featureInfo.features:", featureInfo.features)
     setIsLoadingInfoPanel(false)   
     setFeatures(featureInfo.features)
     return featureInfo

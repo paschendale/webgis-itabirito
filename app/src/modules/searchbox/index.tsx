@@ -15,14 +15,12 @@ function SearchBox({setFeatures,setLoading}: SearchBoxProps) {
   async function onSubmit(data:any) {
     
     setLoading(true)
-    console.log(data) 
 
     const response = await api.post('/search',
     {
       keywords: data.searchInput
     })
 
-    
     setLoading(false)
     setFeatures(response.data.features)
   }
