@@ -1,9 +1,9 @@
-name: Build Frontend 
+name: Build Backend 
 
 on:
   push:
     branches:
-      - 'main'
+      - 'develop'
       - 'feature/ci-workflow' 
 
   workflow_dispatch:
@@ -32,7 +32,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          file: Dockerfile.frontend
+          file: Dockerfile.backend
           tags:  |
-            paschendale/webgis-itabirito-frontend:${{ env.NOW }}
-            paschendale/webgis-itabirito-frontend:stable
+            paschendale/webgis-itabirito-backend:${{ env.NOW }}
+            paschendale/webgis-itabirito-backend:latest
