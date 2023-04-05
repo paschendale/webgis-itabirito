@@ -10,8 +10,12 @@ import {
   PropertyName,
   PropertyValue,
   PropertyContainer,
-  EmptyInfoPane
+  EmptyInfoPane,
+  TextArea,
+  ButtonArea,
+  EachButton
 } from "./styles"
+import { FaFilePdf, FaLocationArrow, FaMapMarkerAlt } from 'react-icons/fa';
 
 interface InfoPaneProps {
   features: any | undefined;
@@ -54,23 +58,39 @@ function FeatureContainer({feature,index}: FeatureContainerProps) {
   return (
     <>
       <FeatureTitleContainer key={index} onClick={() => setOpen(!open)}>
-        <FeatureTitle>{feature.id.split('.')[0]}</FeatureTitle>
-        <FeatureId>{feature.id.split('.')[1]}</FeatureId>
+        <TextArea>
+          <FeatureTitle>{feature.id.split('.')[0]}</FeatureTitle>
+          <FeatureId>{feature.id.split('.')[1]}</FeatureId>
+        </TextArea>
+        <ButtonArea>
+          <EachButton>
+            <FaFilePdf size={25} onClick={() => console.log(`i'm clicked`)}/>
+          </EachButton>
+          <EachButton>
+            <FaMapMarkerAlt size={25} onClick={() => console.log(`i'm clicked`)}/>
+          </EachButton>
+        </ButtonArea>
       </FeatureTitleContainer>
       <Collapsible trigger={''} open={open}>
       <FeatureAttributesContainer> 
         {
           attributesToArray(feature.properties).map((e: any, i: number) => {
-            return (
-              <PropertyContainer key={i}>
-                <PropertyName>
-                  {e.key}
-                </PropertyName>
-                <PropertyValue>
-                  {e.value}
-                </PropertyValue>
-              </PropertyContainer>
-            )
+
+            if (e.key !== 'geom') {
+              return (
+                <PropertyContainer key={i}>
+                  <PropertyName>
+                    {e.key}
+                  </PropertyName>
+                  <PropertyValue>
+                    {e.value}
+                  </PropertyValue>
+                </PropertyContainer>
+              )
+            } else {
+              
+              return null
+            }
           })
         }
       </FeatureAttributesContainer>
