@@ -45,7 +45,7 @@ export async function searchService(keywords: string, layers: Array<string>) {
           'properties', row_to_json(d.*), 
           'type', 'Feature'
         ) AS features
-      FROM dados.${search.table_name} d
+      FROM ${search.table_schema}.${search.table_name} d
       WHERE to_tsvector(${searchBody}) @@ to_tsquery('${keywords}');
     `
     consoleLog(`db: Querying ${search.table_name} for keywords: ${keywords}`)
@@ -63,11 +63,13 @@ export async function searchService(keywords: string, layers: Array<string>) {
 
 export async function verifyTable(tableName: string, tableSchema?: string) {
 
-  if (tableName.includes('.')) {
+  var tableNameArray = tableName.split('.')
 
-    tableSchema = tableName.split('.')[0]
-    tableName = tableName.split('.')[1]
-  } else if (!tableSchema && !tableName.includes('.'))(
+  if (tableNameArray.length > 1) {
+
+    tableSchema = tableNameArray[0]
+    tableName = tableNameArray[1]
+  } else if (!tableSchema && tableNameArray.length === 1)(
     
     tableSchema = 'dados'
   )

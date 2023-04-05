@@ -80,6 +80,7 @@ function Map() {
   }
 
   function createLayer(layer: any, baseLayer?: boolean) {
+    console.log("🚀 ~ file: index.tsx:83 ~ createLayer ~ layer:", layer)
 
     if(!baseLayer) {
       baseLayer = false
@@ -87,8 +88,8 @@ function Map() {
 
     return (
       <WMSTileLayer
-        key={layer.Name}
-        id={layer.Name}
+        key={layer.Title}
+        id={layer.Title}
         url={`/api/map/${projectId}`}
         layers={layer.Name}
         format={baseLayer ? 'image/jpeg' : 'image/png'}
@@ -128,6 +129,7 @@ function Map() {
     var response = await api.get(`/map/${projectId}?${queryParams}`)
 
     var featureInfo = response.data
+    console.log("🚀 ~ file: index.tsx:132 ~ getFeatureInfo ~ featureInfo:", featureInfo)
 
     setIsLoadingInfoPanel(false)   
     setFeatures(featureInfo.features)
