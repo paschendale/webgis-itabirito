@@ -8,9 +8,10 @@ interface SearchBoxProps {
   setFeatures: React.Dispatch<React.SetStateAction<any>>;
   setLoading: React.Dispatch<React.SetStateAction<any>>;
   setDisplayLeftSidePanel: React.Dispatch<React.SetStateAction<any>>;
+  layers: any;
 }
 
-function SearchBox({setFeatures,setLoading,setDisplayLeftSidePanel}: SearchBoxProps) {
+function SearchBox({setFeatures,setLoading,setDisplayLeftSidePanel,layers}: SearchBoxProps) {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
 
   async function onSubmit(data:any) {
@@ -20,7 +21,8 @@ function SearchBox({setFeatures,setLoading,setDisplayLeftSidePanel}: SearchBoxPr
 
     const response = await api.post('/search',
     {
-      keywords: data.searchInput
+      keywords: data.searchInput,
+      layers: layers?.filter((e: any) => e['@_queryable'] === '1').map((e: any) => e.Name)
     })
 
     setLoading(false)

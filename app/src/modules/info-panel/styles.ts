@@ -24,15 +24,16 @@ interface FeatureTitleContainerProps {
 }
 
 export const FeatureTitleContainer = styled.div<FeatureTitleContainerProps>`
-  background-image: url(${featurePlaceholder});
+  background-image: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 90%),url(${featurePlaceholder});
   background-size: 110%;
   width: 100%;
   max-width: 320px;
   min-height: 80px;
   margin-bottom: 5px;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
   cursor: pointer;
   transition: all 0.5s;
   margin-left: 5px;
@@ -40,8 +41,39 @@ export const FeatureTitleContainer = styled.div<FeatureTitleContainerProps>`
 
   &:hover {
     height: 120px;
-    background-image: url(${featurePlaceholder});
-    background-size: 110%;
+    background-image: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 90%), url(${featurePlaceholder});
+    background-size: 100%;
+  }
+`
+
+export const TextArea = styled.div`
+  max-width: 70%;
+  display: flex;
+  white-space: nowrap;
+  overflow: hidden;
+  flex-direction: column;
+  text-overflow: ellipsis;
+`
+
+export const ButtonArea = styled.div`
+  display: flex;
+  flex-direction: row;
+  color: white;
+  margin-right: 10px;  
+  
+  @media (prefers-color-scheme: dark) {
+    color: rgb(180,180,180);
+  }
+`
+
+export const EachButton = styled.div`
+  margin: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    color: white;
+    scale: 1.1;
   }
 `
 
@@ -61,6 +93,7 @@ export const FeatureId = styled.h3`
 
 export const FeatureAttributesContainer = styled.div`
   margin-left: 5px;
+  margin-bottom: 5px;
   width: 320px;
 
   @media (prefers-color-scheme: dark) {

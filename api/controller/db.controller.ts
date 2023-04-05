@@ -15,10 +15,10 @@ export async function searchController(req: Request, res: Response) {
       throw new Error('O corpo da requisição deve informar a propriedade "keywords" com as chaves de pesquisa desejadas.')
     }
 
-    const rows = await searchService(req.body.keywords) 
+    const rows = await searchService(req.body.keywords, req.body.layers) 
 
-    consoleLog(`db: (200) Found ${rows[0].features.features.length} results`)
-    return res.status(200).send(rows[0].features)
+    consoleLog(`db: (200) Found ${rows.features.length} results`)
+    return res.status(200).send(rows)
   } catch (error) {
     
     errorTreatment(error)
