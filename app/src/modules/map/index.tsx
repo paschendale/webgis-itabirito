@@ -189,6 +189,7 @@ function Map() {
         <SearchBox 
           setFeatures={setFeatures}
           setLoading={setIsLoadingInfoPanel}
+          setDisplayLeftSidePanel={setdisplayLeftSidePanel}
         />
         <MapContainer 
           center={[-20.25554, -43.80376]} 

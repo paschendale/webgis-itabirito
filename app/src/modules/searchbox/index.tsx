@@ -7,14 +7,16 @@ import { SetStateAction } from "react";
 interface SearchBoxProps { 
   setFeatures: React.Dispatch<React.SetStateAction<any>>;
   setLoading: React.Dispatch<React.SetStateAction<any>>;
+  setDisplayLeftSidePanel: React.Dispatch<React.SetStateAction<any>>;
 }
 
-function SearchBox({setFeatures,setLoading}: SearchBoxProps) {
+function SearchBox({setFeatures,setLoading,setDisplayLeftSidePanel}: SearchBoxProps) {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
 
   async function onSubmit(data:any) {
     
     setLoading(true)
+    setDisplayLeftSidePanel(true)
 
     const response = await api.post('/search',
     {
