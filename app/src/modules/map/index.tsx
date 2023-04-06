@@ -16,6 +16,7 @@ import pj from "./../../../package.json"
 import L from 'leaflet';
 import 'proj4';
 import 'proj4leaflet';
+import SelectedFeatures from './components/selectedFeatures';
 
 interface Layer {
   '@_queryable': string;
@@ -122,7 +123,6 @@ function Map() {
     var response = await api.get(`/map/${projectId}?${queryParams}`)
 
     var featureInfo = response.data
-    console.log("🚀 ~ file: index.tsx:132 ~ getFeatureInfo ~ featureInfo:", featureInfo)
 
     setIsLoadingInfoPanel(false)   
     setFeatures(featureInfo.features)
@@ -146,38 +146,6 @@ function Map() {
   function streetView(e: any) {
     console.log('veremos em breve')
   }
-
-  function makeGeojson(features: any): any {
-
-    if(features === undefined) {
-      return {
-        type: 'FeatureCollection',
-        features: []
-      }
-    }
-    
-    var geojson = {
-      type: 'FeatureCollection',
-      "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3857" } },
-      features: features
-    }
-
-    return geojson
-  }
-  
-  const SelectedFeatures = ({ features }: any) => {
-
-    const map = useMap();
-    const geoJsonLayer = L.Proj.geoJson(makeGeojson(features),{
-      style: {
-        "color": "#ffff00",
-        "fillColor": "#ffff006c",
-        "weight": 3
-      }
-    });
-    geoJsonLayer.addTo(map);
-    return null;
-  };
 
   const MapHandlers = () => {
     
