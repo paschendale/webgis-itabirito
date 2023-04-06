@@ -74,7 +74,6 @@ function Map() {
   }
 
   function createLayer(layer: any, baseLayer?: boolean) {
-    console.log("🚀 ~ file: index.tsx:83 ~ createLayer ~ layer:", layer)
 
     if(!baseLayer) {
       baseLayer = false

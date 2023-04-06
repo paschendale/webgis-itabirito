@@ -40,7 +40,7 @@ export async function searchService(keywords: string, layers: Array<string>) {
         '${search.table_name}'::text AS table_name,
         ${searchBody} AS search_body,
         json_build_object(
-          'geometry', st_asgeojson(d.geom), 
+          'geometry', st_asgeojson(ST_Transform(d.geom,3857))::json, 
           'id', ('${search.table_name}'::text || '.'::text) || d.${search.table_pk}::text, 
           'properties', row_to_json(d.*), 
           'type', 'Feature'
