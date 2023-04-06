@@ -1,31 +1,25 @@
-import { MapContainer, useMapEvents, WMSTileLayer, GeoJSON } from 'react-leaflet'
+import { MapContainer, useMapEvents, WMSTileLayer, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import './styles.css'
 import { useEffect, useState } from "react"
 import SearchBox from '../searchbox';
 import InfoPanel from '../info-panel';
-import { ButtonsContainer, Container, LeftSidePanel, LeftSidePanelSwitcher, MiddlePanel, Placeholder, RightSidePanel, RightSidePanelSwitcher, Version } from './styles';
+import { ButtonsContainer, Container, LeftSidePanel, LeftSidePanelSwitcher, MiddlePanel, RightSidePanel, RightSidePanelSwitcher, Version } from './styles';
 import { api } from '../../services/api';
 import { LeafletMouseEvent } from 'leaflet';
 import { generateQueryParams } from '../../utils';
 import { FaCaretLeft, FaCaretRight, FaGithub, FaRulerCombined, FaStreetView } from 'react-icons/fa';
-import { GeoJsonObject } from 'geojson';
 import MapButton from '../../components/mapButton';
 import PanoramicViewer from '../../components/panoramic-viewer';
 import { useLocation } from 'react-router-dom';
 import pj from "./../../../package.json"
+import L from 'leaflet';
+import 'proj4';
+import 'proj4leaflet';
 
 interface Layer {
   '@_queryable': string;
   Name: string,
-}
-
-interface Feature {
-  bbox?: Array<number>;
-  geometry: any;
-  id: string;
-  properties: any;
-  type: string;
 }
 
 function Map() {
@@ -41,7 +35,7 @@ function Map() {
   // Info Panel states
   const[displayLeftSidePanel,setdisplayLeftSidePanel] = useState(false)
   const[displayRightSidePanel,setdisplayRightSidePanel] = useState(false)
-  const[features,setFeatures] = useState<Feature>()
+  const[features,setFeatures] = useState<any>()
   const[isLoadingInfoPanel,setIsLoadingInfoPanel] = useState(false)
 
   useEffect(() => {
@@ -152,6 +146,38 @@ function Map() {
     console.log('veremos em breve')
   }
 
+  function makeGeojson(features: any): any {
+
+    if(features === undefined) {
+      return {
+        type: 'FeatureCollection',
+        features: []
+      }
+    }
+    
+    var geojson = {
+      type: 'FeatureCollection',
+      "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3857" } },
+      features: features
+    }
+
+    return geojson
+  }
+  
+  const SelectedFeatures = ({ features }: any) => {
+
+    const map = useMap();
+    const geoJsonLayer = L.Proj.geoJson(makeGeojson(features),{
+      style: {
+        "color": "#ffff00",
+        "fillColor": "#ffff006c",
+        "weight": 3
+      }
+    });
+    geoJsonLayer.addTo(map);
+    return null;
+  };
+
   const MapHandlers = () => {
     
     useMapEvents({
@@ -198,17 +224,19 @@ function Map() {
           scrollWheelZoom={true}
           attributionControl={false}
           >  
-          {/* <GeoJSON 
-            key={JSON.stringify(Date.now())} 
-            data={features!} 
-            style={{color: 'red'}}
-          />     */}
           <MapHandlers/>
           {layers && <>
             {
               makeLayers(layers,layerOrder)
             }
           </>}
+          {/* <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          /> */}
+          <SelectedFeatures
+            features={features}
+          />   
         </MapContainer>
         <Version>
           <div style={{padding: 4}}>
