@@ -35,4 +35,4 @@ jobs:
           file: Dockerfile.backend
           tags:  |
             paschendale/webgis-itabirito-backend:${{ env.NOW }}
-            paschendale/webgis-itabirito-backend:latest
+            paschendale/webgis-itabirito-backend:stable

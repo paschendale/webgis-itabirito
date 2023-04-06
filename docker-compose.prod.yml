@@ -6,15 +6,17 @@ services:
     volumes:
       - './proxy/proxy.conf:/etc/nginx/conf.d/default.conf'
     ports:
-      - 80:80
+      - 100:80
 
   webgis-frontend:
-    image: paschendale/webgis-itabirito-frontend:latest
+    image: paschendale/webgis-itabirito-frontend:stable
     container_name: webgis-frontend
     hostname: webgis-frontend
+    labels:
+      - "com.centurylinklabs.watchtower.scope=webgis.itabirito"
 
   webgis-backend:
-    image: paschendale/webgis-itabirito-backend:latest
+    image: paschendale/webgis-itabirito-backend:stable
     container_name: webgis-backend
     hostname: webgis-backend
     environment:
@@ -23,11 +25,15 @@ services:
       - PG_HOST=
       - PG_PASSWORD=
       - PG_PORT=
-      - QGIS_SERVER_URL=
+      - QGIS_SERVER_URL=https://qgis.itabirito.genteufv.com.br/
+    labels:
+      - "com.centurylinklabs.watchtower.scope=webgis.itabirito"
 
   webgis-watchtower:
     image: containrrr/watchtower
     container_name: webgis-watchtower
     volumes:
       - //var/run/docker.sock:/var/run/docker.sock
-    command: --interval 300 webgis-frontend webgis-backend
+    command: --interval 300 webgis-frontend webgis-backend --scope webgis.itabirito
+    labels:
+      - "com.centurylinklabs.watchtower.scope=webgis.itabirito"
