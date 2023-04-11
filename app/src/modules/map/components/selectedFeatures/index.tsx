@@ -8,27 +8,27 @@ interface SelectedFeaturesProps {
   features: any;
 }
 
+export function makeGeojson(features: any): any {
+
+  if(features === undefined) {
+    return {
+      type: 'FeatureCollection',
+      features: []
+    }
+  }
+  
+  var geojson = {
+    type: 'FeatureCollection',
+    "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3857" } },
+    features: features
+  }
+
+  return geojson
+}
+
 const SelectedFeatures = ({ features }: SelectedFeaturesProps) => {
   const map = useMap();
   const [geoJsonLayer, setGeoJsonLayer] = useState<L.GeoJSON>();
-
-  function makeGeojson(features: any): any {
-
-    if(features === undefined) {
-      return {
-        type: 'FeatureCollection',
-        features: []
-      }
-    }
-    
-    var geojson = {
-      type: 'FeatureCollection',
-      "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3857" } },
-      features: features
-    }
-
-    return geojson
-  }
 
   var markerStyle = {
     radius: 5,
@@ -40,9 +40,11 @@ const SelectedFeatures = ({ features }: SelectedFeaturesProps) => {
   };
 
   useEffect(() => {
+
     if (geoJsonLayer) {
       map.removeLayer(geoJsonLayer);
     }
+    
     const newGeoJsonLayer = L.Proj.geoJson(makeGeojson(features), {
       style: {
         color: "#ffff00",
@@ -53,6 +55,7 @@ const SelectedFeatures = ({ features }: SelectedFeaturesProps) => {
         return L.circleMarker(latlng, markerStyle);
       }
     });
+
     newGeoJsonLayer.addTo(map);
     setGeoJsonLayer(newGeoJsonLayer); 
     
@@ -60,7 +63,7 @@ const SelectedFeatures = ({ features }: SelectedFeaturesProps) => {
     if (bounds.isValid()) {
       map.flyToBounds(bounds);
     }
-    
+
     return () => {
       if (newGeoJsonLayer) {
         map.removeLayer(newGeoJsonLayer);

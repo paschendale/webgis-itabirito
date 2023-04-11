@@ -1,7 +1,7 @@
-import { MapContainer, useMapEvents, WMSTileLayer, useMap } from 'react-leaflet'
+import { MapContainer, useMapEvents, WMSTileLayer } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import './styles.css'
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import SearchBox from '../searchbox';
 import InfoPanel from '../info-panel';
 import { ButtonsContainer, Container, LeftSidePanel, LeftSidePanelSwitcher, MiddlePanel, RightSidePanel, RightSidePanelSwitcher, Version } from './styles';
@@ -13,7 +13,6 @@ import MapButton from '../../components/mapButton';
 import PanoramicViewer from '../../components/panoramic-viewer';
 import { useLocation } from 'react-router-dom';
 import pj from "./../../../package.json"
-import L from 'leaflet';
 import 'proj4';
 import 'proj4leaflet';
 import SelectedFeatures from './components/selectedFeatures';
@@ -26,6 +25,7 @@ interface Layer {
 function Map() {
 
   const location = useLocation()
+  const mapRef = useRef<any>(null);
 
   // Project states
   const[projectId,setProjectId] = useState(location.pathname.split('/map/')[1])
@@ -88,6 +88,8 @@ function Map() {
         layers={layer.Name}
         format={baseLayer ? 'image/jpeg' : 'image/png'}
         transparent={!baseLayer}
+        maxZoom={30}
+        maxNativeZoom={30}
       />
     )
   }
@@ -149,7 +151,7 @@ function Map() {
 
   const MapHandlers = () => {
     
-    useMapEvents({
+    const map = useMapEvents({
         click(e) {
 
           if(!displayLeftSidePanel) {
@@ -157,6 +159,9 @@ function Map() {
           }
           setIsLoadingInfoPanel(true) 
           getFeatureInfo(this,e)
+        },
+        zoomend: () => {
+          console.log(map,map.getZoom());
         },
     });
 
@@ -169,6 +174,7 @@ function Map() {
         <InfoPanel 
           features={features} 
           isLoading={isLoadingInfoPanel}
+          map={mapRef.current}
         />
       </LeftSidePanel>
       <MiddlePanel>
@@ -192,17 +198,14 @@ function Map() {
           zoom={17} 
           scrollWheelZoom={true}
           attributionControl={false}
-          >  
+          ref={mapRef}
+        >  
           <MapHandlers/>
           {layers && <>
             {
               makeLayers(layers,layerOrder)
             }
           </>}
-          {/* <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          /> */}
           <SelectedFeatures
             features={features}
           />   
