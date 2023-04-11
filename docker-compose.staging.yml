@@ -20,11 +20,11 @@ services:
     container_name: webgis-backend-staging
     hostname: webgis-backend
     environment:
-      - PG_DATABASE=itabirito
-      - PG_USER=marotta
-      - PG_HOST=200.235.135.49
-      - PG_PASSWORD=o9*h@,
-      - PG_PORT=5432
+      - PG_DATABASE=
+      - PG_USER=
+      - PG_HOST=
+      - PG_PASSWORD=
+      - PG_PORT=
       - QGIS_SERVER_URL=https://qgis.itabirito.genteufv.com.br/
     labels:
       - "com.centurylinklabs.watchtower.scope=webgis.itabirito.staging"
@@ -34,6 +34,6 @@ services:
     container_name: webgis-watchtower-staging
     volumes:
       - //var/run/docker.sock:/var/run/docker.sock
-    command: --interval 300 webgis-frontend webgis-backend --scope webgis.itabirito.staging
+    command: --interval 300 webgis-frontend-staging webgis-backend-staging --scope webgis.itabirito.staging
     labels:
       - "com.centurylinklabs.watchtower.scope=webgis.itabirito.staging"
