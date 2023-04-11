@@ -1,36 +1,31 @@
-import { MapContainer, useMapEvents, WMSTileLayer, GeoJSON } from 'react-leaflet'
+import { MapContainer, useMapEvents, WMSTileLayer } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import './styles.css'
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import SearchBox from '../searchbox';
 import InfoPanel from '../info-panel';
-import { ButtonsContainer, Container, LeftSidePanel, LeftSidePanelSwitcher, MiddlePanel, Placeholder, RightSidePanel, RightSidePanelSwitcher, Version } from './styles';
+import { ButtonsContainer, Container, LeftSidePanel, LeftSidePanelSwitcher, MiddlePanel, RightSidePanel, RightSidePanelSwitcher, Version } from './styles';
 import { api } from '../../services/api';
 import { LeafletMouseEvent } from 'leaflet';
 import { generateQueryParams } from '../../utils';
 import { FaCaretLeft, FaCaretRight, FaGithub, FaRulerCombined, FaStreetView } from 'react-icons/fa';
-import { GeoJsonObject } from 'geojson';
 import MapButton from '../../components/mapButton';
 import PanoramicViewer from '../../components/panoramic-viewer';
 import { useLocation } from 'react-router-dom';
 import pj from "./../../../package.json"
+import 'proj4';
+import 'proj4leaflet';
+import SelectedFeatures from './components/selectedFeatures';
 
 interface Layer {
   '@_queryable': string;
   Name: string,
 }
 
-interface Feature {
-  bbox?: Array<number>;
-  geometry: any;
-  id: string;
-  properties: any;
-  type: string;
-}
-
 function Map() {
 
   const location = useLocation()
+  const mapRef = useRef<any>(null);
 
   // Project states
   const[projectId,setProjectId] = useState(location.pathname.split('/map/')[1])
@@ -41,7 +36,7 @@ function Map() {
   // Info Panel states
   const[displayLeftSidePanel,setdisplayLeftSidePanel] = useState(false)
   const[displayRightSidePanel,setdisplayRightSidePanel] = useState(false)
-  const[features,setFeatures] = useState<Feature>()
+  const[features,setFeatures] = useState<any>()
   const[isLoadingInfoPanel,setIsLoadingInfoPanel] = useState(false)
 
   useEffect(() => {
@@ -80,7 +75,6 @@ function Map() {
   }
 
   function createLayer(layer: any, baseLayer?: boolean) {
-    console.log("🚀 ~ file: index.tsx:83 ~ createLayer ~ layer:", layer)
 
     if(!baseLayer) {
       baseLayer = false
@@ -94,6 +88,8 @@ function Map() {
         layers={layer.Name}
         format={baseLayer ? 'image/jpeg' : 'image/png'}
         transparent={!baseLayer}
+        maxZoom={30}
+        maxNativeZoom={30}
       />
     )
   }
@@ -129,7 +125,6 @@ function Map() {
     var response = await api.get(`/map/${projectId}?${queryParams}`)
 
     var featureInfo = response.data
-    console.log("🚀 ~ file: index.tsx:132 ~ getFeatureInfo ~ featureInfo:", featureInfo)
 
     setIsLoadingInfoPanel(false)   
     setFeatures(featureInfo.features)
@@ -156,7 +151,7 @@ function Map() {
 
   const MapHandlers = () => {
     
-    useMapEvents({
+    const map = useMapEvents({
         click(e) {
 
           if(!displayLeftSidePanel) {
@@ -164,6 +159,9 @@ function Map() {
           }
           setIsLoadingInfoPanel(true) 
           getFeatureInfo(this,e)
+        },
+        zoomend: () => {
+          console.log(map,map.getZoom());
         },
     });
 
@@ -176,6 +174,7 @@ function Map() {
         <InfoPanel 
           features={features} 
           isLoading={isLoadingInfoPanel}
+          map={mapRef.current}
         />
       </LeftSidePanel>
       <MiddlePanel>
@@ -199,18 +198,17 @@ function Map() {
           zoom={17} 
           scrollWheelZoom={true}
           attributionControl={false}
-          >  
-          {/* <GeoJSON 
-            key={JSON.stringify(Date.now())} 
-            data={features!} 
-            style={{color: 'red'}}
-          />     */}
+          ref={mapRef}
+        >  
           <MapHandlers/>
           {layers && <>
             {
               makeLayers(layers,layerOrder)
             }
           </>}
+          <SelectedFeatures
+            features={features}
+          />   
         </MapContainer>
         <Version>
           <div style={{padding: 4}}>

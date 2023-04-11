@@ -2,7 +2,6 @@ import { SearchBoxContainer, SearchButton, SearchInput } from "./styles";
 import { FaSearch } from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
 import { api } from "../../services/api";
-import { SetStateAction } from "react";
 
 interface SearchBoxProps { 
   setFeatures: React.Dispatch<React.SetStateAction<any>>;
