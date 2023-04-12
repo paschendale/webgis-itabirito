@@ -16,6 +16,8 @@ import pj from "./../../../package.json"
 import 'proj4';
 import 'proj4leaflet';
 import SelectedFeatures from './components/selectedFeatures';
+import { ToastContainer, toast } from "react-toastify"
+import 'react-toastify/dist/ReactToastify.css';
 
 interface Layer {
   '@_queryable': string;
@@ -122,13 +124,29 @@ function Map() {
 
     var queryParams = generateQueryParams(params)
 
-    var response = await api.get(`/map/${projectId}?${queryParams}`)
+    try {
+      
+      var response = await api.get(`/map/${projectId}?${queryParams}`)
+  
+      var featureInfo = response.data
+  
+      setIsLoadingInfoPanel(false)   
+      setFeatures(featureInfo.features)
+      return featureInfo
+    } catch (error) {
+      
+      toast.error(
+        'Ocorreu um erro ao tentar obter as feições no local selecionado.',
+        {
+          autoClose: 5000,
+          position: toast.POSITION.TOP_RIGHT
+        }
+      )
+      setIsLoadingInfoPanel(false)   
+      setFeatures([])
+      return null
+    }
 
-    var featureInfo = response.data
-
-    setIsLoadingInfoPanel(false)   
-    setFeatures(featureInfo.features)
-    return featureInfo
   }
 
   function switchLeftPanel() {
@@ -169,60 +187,63 @@ function Map() {
   };
 
   return ( 
-    <Container>
-      <LeftSidePanel display={displayLeftSidePanel}>
-        <InfoPanel 
-          features={features} 
-          isLoading={isLoadingInfoPanel}
-          map={mapRef.current}
-        />
-      </LeftSidePanel>
-      <MiddlePanel>
-        <ButtonsContainer>
-          <MapButton onClick={measureTool}><FaRulerCombined/></MapButton>
-          <MapButton onClick={streetView}>
-            <FaStreetView />
-          </MapButton>
-        </ButtonsContainer>
-        <LeftSidePanelSwitcher onClick={switchLeftPanel}>
-            {(displayLeftSidePanel)? (<FaCaretLeft/>) : (<FaCaretRight/> )}
-        </LeftSidePanelSwitcher>
-        <SearchBox 
-          setFeatures={setFeatures}
-          setLoading={setIsLoadingInfoPanel}
-          setDisplayLeftSidePanel={setdisplayLeftSidePanel}
-          layers={layers}
-        />
-        <MapContainer 
-          center={[-20.25554, -43.80376]} 
-          zoom={17} 
-          scrollWheelZoom={true}
-          attributionControl={false}
-          ref={mapRef}
-        >  
-          <MapHandlers/>
-          {layers && <>
-            {
-              makeLayers(layers,layerOrder)
-            }
-          </>}
-          <SelectedFeatures
-            features={features}
-          />   
-        </MapContainer>
-        <Version>
-          <div style={{padding: 4}}>
-            webgis-itabirito:v.{pj.version} <a style={{color: 'inherit'}} href='https://github.com/paschendale/webgis-itabirito' target={'_blank'} rel="noreferrer"><span style={{color: 'inherit'}}><FaGithub/></span></a>
-          </div>
-        </Version>
-        <RightSidePanelSwitcher onClick={switchRightPanel}>
-            {(displayRightSidePanel)? (<FaCaretRight/> ) : (<FaCaretLeft/>)}
-        </RightSidePanelSwitcher>
-      </MiddlePanel>
-      <RightSidePanel display={displayRightSidePanel}>
-          <PanoramicViewer></PanoramicViewer>
-      </RightSidePanel>
-    </Container>
+    <>
+      <Container>
+        <LeftSidePanel display={displayLeftSidePanel}>
+          <InfoPanel 
+            features={features} 
+            isLoading={isLoadingInfoPanel}
+            map={mapRef.current}
+          />
+        </LeftSidePanel>
+        <MiddlePanel>
+          <ButtonsContainer>
+            <MapButton onClick={measureTool}><FaRulerCombined/></MapButton>
+            <MapButton onClick={streetView}>
+              <FaStreetView />
+            </MapButton>
+          </ButtonsContainer>
+          <LeftSidePanelSwitcher onClick={switchLeftPanel}>
+              {(displayLeftSidePanel)? (<FaCaretLeft/>) : (<FaCaretRight/> )}
+          </LeftSidePanelSwitcher>
+          <SearchBox 
+            setFeatures={setFeatures}
+            setLoading={setIsLoadingInfoPanel}
+            setDisplayLeftSidePanel={setdisplayLeftSidePanel}
+            layers={layers}
+          />
+          <MapContainer 
+            center={[-20.25554, -43.80376]} 
+            zoom={17} 
+            scrollWheelZoom={true}
+            attributionControl={false}
+            ref={mapRef}
+          >  
+            <MapHandlers/>
+            {layers && <>
+              {
+                makeLayers(layers,layerOrder)
+              }
+            </>}
+            <SelectedFeatures
+              features={features}
+            />   
+          </MapContainer>
+          <Version>
+            <div style={{padding: 4}}>
+              webgis-itabirito:v.{pj.version} <a style={{color: 'inherit'}} href='https://github.com/paschendale/webgis-itabirito' target={'_blank'} rel="noreferrer"><span style={{color: 'inherit'}}><FaGithub/></span></a>
+            </div>
+          </Version>
+          <RightSidePanelSwitcher onClick={switchRightPanel}>
+              {(displayRightSidePanel)? (<FaCaretRight/> ) : (<FaCaretLeft/>)}
+          </RightSidePanelSwitcher>
+        </MiddlePanel>
+        <RightSidePanel display={displayRightSidePanel}>
+            <PanoramicViewer></PanoramicViewer>
+        </RightSidePanel>
+      </Container>
+      <ToastContainer />
+    </>
   );
 }
 
