@@ -7,7 +7,7 @@ import InfoPanel from '../info-panel';
 import { ButtonsContainer, Container, LeftSidePanel, LeftSidePanelSwitcher, MiddlePanel, RightSidePanel, RightSidePanelSwitcher, Version } from './styles';
 import { api } from '../../services/api';
 import { LeafletMouseEvent } from 'leaflet';
-import { generateQueryParams } from '../../utils';
+import { generateQueryParams, toastError } from '../../utils';
 import { FaCaretLeft, FaCaretRight, FaGithub, FaRulerCombined, FaStreetView } from 'react-icons/fa';
 import MapButton from '../../components/mapButton';
 import PanoramicViewer from '../../components/panoramic-viewer';
@@ -16,7 +16,7 @@ import pj from "./../../../package.json"
 import 'proj4';
 import 'proj4leaflet';
 import SelectedFeatures from './components/selectedFeatures';
-import { ToastContainer, toast } from "react-toastify"
+import { ToastContainer } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';
 
 interface Layer {
@@ -45,11 +45,17 @@ function Map() {
 
     async function getProjectSettings() {
     
-      const projectSettings = await api.get(
-        `/settings/${projectId}` 
-      )
-  
-      return projectSettings.data
+      try {
+        
+        const projectSettings = await api.get(
+          `/settings/${projectId}` 
+        )
+    
+        return projectSettings.data
+      } catch (error) {
+        
+        toastError('Ocorreu um erro ao tentar obter as configurações do projeto.')
+      }
     }
     
     getProjectSettings()
@@ -135,13 +141,7 @@ function Map() {
       return featureInfo
     } catch (error) {
       
-      toast.error(
-        'Ocorreu um erro ao tentar obter as feições no local selecionado.',
-        {
-          autoClose: 5000,
-          position: toast.POSITION.TOP_RIGHT
-        }
-      )
+      toastError('Ocorreu um erro ao tentar obter as feições no local selecionado.')
       setIsLoadingInfoPanel(false)   
       setFeatures([])
       return null
