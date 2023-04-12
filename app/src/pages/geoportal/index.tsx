@@ -71,7 +71,7 @@ export default function Geoportal() {
                 <>
                   {webgisList?.map((e) => {
 
-                    if (e.url) {
+                    if ((e.id) !== undefined) {
 
                       return (
                         <ServiceCard key={e.id} title={e.title} backgroundColor="#590404" color={e.color || "white"} url={`/map/${e.id}`}/>
