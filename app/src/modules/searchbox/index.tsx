@@ -2,6 +2,7 @@ import { SearchBoxContainer, SearchButton, SearchInput } from "./styles";
 import { FaSearch } from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
 import { api } from "../../services/api";
+import { toastError } from "../../utils";
 
 interface SearchBoxProps { 
   setFeatures: React.Dispatch<React.SetStateAction<any>>;
@@ -18,14 +19,23 @@ function SearchBox({setFeatures,setLoading,setDisplayLeftSidePanel,layers}: Sear
     setLoading(true)
     setDisplayLeftSidePanel(true)
 
-    const response = await api.post('/search',
-    {
-      keywords: data.searchInput,
-      layers: layers?.filter((e: any) => e['@_queryable'] === '1').map((e: any) => e.Name)
-    })
+    try {
+      
+      const response = await api.post('/search',
+      {
+        keywords: data.searchInput,
+        layers: layers?.filter((e: any) => e['@_queryable'] === '1').map((e: any) => e.Name)
+      })
+  
+      setLoading(false)
+      setFeatures(response.data.features)
+    } catch (error) {
+      
+      toastError('Ocorreu um erro ao tentar obter os resultados da pesquisa.')
+      setLoading(false)
+      setFeatures([])
+    }
 
-    setLoading(false)
-    setFeatures(response.data.features)
   }
 
   return (
