@@ -3,6 +3,9 @@ import { api } from "../../services/api"
 import { GeoportalContainer, GeoportalViewport, Navbar, NavbarBrand, ServicesContainer, ServicesTitleContainer, NavbarLogo, NavbarTitle } from "./styles"
 import ServiceCard from "../../components/serviceCard"
 import brasao from "./../../assets/brasao.png"
+import { ToastContainer, toast } from "react-toastify"
+import 'react-toastify/dist/ReactToastify.css';
+import { Card, CardTitle, ServiceCardContainer } from "../../components/serviceCard/styles"
 
 export default function Geoportal() {
   const[webgisList,setWebgisList] = useState<Array<any>>([])
@@ -21,6 +24,18 @@ export default function Geoportal() {
     .then((data) => {
       
       setWebgisList(data.projects)
+      setIsLoadingWebgisList(false)
+    })
+    .catch(e => {
+
+      toast.error(
+        'Ocorreu um erro ao carregar o catálogo de WebGIS',
+        {
+          position: toast.POSITION.BOTTOM_LEFT,
+          autoClose: 10000
+        }
+      )
+      setWebgisList([{title: 'Não foi possível carregar os WebGIS'}])
       setIsLoadingWebgisList(false)
     })
   },[])
@@ -55,9 +70,24 @@ export default function Geoportal() {
               ) : (
                 <>
                   {webgisList?.map((e) => {
-                    return (
-                      <ServiceCard key={e.id} title={e.title} backgroundColor="#590404" color="white" url={`/map/${e.id}`}/>
-                    )
+
+                    if ((e.id) !== undefined) {
+
+                      return (
+                        <ServiceCard key={e.id} title={e.title} backgroundColor="#590404" color={e.color || "white"} url={`/map/${e.id}`}/>
+                      )
+                    } else {
+
+                      return (
+                        <ServiceCardContainer>
+                          <Card>
+                            <CardTitle>
+                              Não foi possível carregar os WebGIS
+                            </CardTitle>
+                          </Card>
+                        </ServiceCardContainer>
+                      )
+                    }
                   })}
                 </>
               )
@@ -67,6 +97,7 @@ export default function Geoportal() {
           </ServicesContainer>
         </GeoportalViewport>
       </GeoportalContainer>
+      <ToastContainer />
     </>
   )
 }

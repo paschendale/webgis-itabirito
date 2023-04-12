@@ -1,3 +1,5 @@
+import { toast } from "react-toastify"
+
 export function generateQueryParams(object: any) {
 
   const objSize = Object.keys(object).length
@@ -18,4 +20,15 @@ export function generateQueryParams(object: any) {
     })
     .join('&')
   );
+}
+
+export function toastError(errorMessage: string) {
+  
+  toast.error(
+    errorMessage,
+    {
+      autoClose: 5000,
+      position: toast.POSITION.TOP_RIGHT
+    }
+  )
 }
