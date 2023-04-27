@@ -17,7 +17,7 @@ export const LoginPage = styled.div`
 
 export const LoginContainer = styled.div`
   width: 90%;
-  max-width: 500px;
+  max-width: 800px;
   height: 50%;
   max-height: 350px;
   border-radius: 5px;
@@ -55,6 +55,19 @@ export const LeftSide = styled.div`
   }
 `
 
+export const Text = styled.p`
+  width: 90%;
+  text-align: center;
+  font-size: large;
+  line-height: 1.5;
+`
+
+export const SmallText = styled.p`
+  width: 90%;
+  text-align: center;
+  font-size: xx-small;
+`
+
 export const RightSide = styled.div`
   width: 50%;
   height: 80%;
@@ -72,11 +85,27 @@ export const RightSide = styled.div`
 
 export const Form = styled.form`
   height: 80%;
+  width: 75%;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
 
   @media (prefers-color-scheme: dark) {
     color: whitesmoke;
+  }
+`
+
+export const Input = styled.input`
+  width: 100%;
+  height: 35px;
+  margin-bottom: 10px;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+
+  @media (prefers-color-scheme: dark) {
+    border-color: whitesmoke;
+    color: whitesmoke;
+    background-color: rgba(0,0,0,0);
   }
 `

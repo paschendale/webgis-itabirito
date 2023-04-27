@@ -1,4 +1,4 @@
-import { LoginPage, LoginContainer, LeftSide, RightSide, Form } from "./styles";
+import { LoginPage, LoginContainer, LeftSide, RightSide, Form, Input, Text, SmallText } from "./styles";
 import { useForm } from 'react-hook-form';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -6,9 +6,11 @@ import { api } from "../../services/api";
 import { useHistory } from "react-router";
 import { useState } from "react";
 import ContentLoader from "react-content-loader";
-import { Box } from "@mui/system";
+import { Box, createTheme } from "@mui/system";
+import { useMediaQuery } from "@mui/material";
 
 export function Login() {
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
   const { register, handleSubmit, formState: { errors } } = useForm();
 
@@ -39,12 +41,26 @@ export function Login() {
   return (
     <LoginPage>
       <LoginContainer>
-        <LeftSide>left</LeftSide>
+        <LeftSide>
+          <Text>
+            O acesso ao Geoportal de Itabirito 
+            é realizado através do CPF e 
+            senha de usuário cadastrado
+            pela prefeitura ou pela conta gov.br.
+            Após identificado, o usuário tem 
+            acesso a um maior número de 
+            serviços como o <b>Sistema de 
+            Gestão Fundiária Municipal</b>, 
+            emissão de documentos e certidões,
+            mapas interativos e conteúdos 
+            exclusivos. 
+          </Text>
+        </LeftSide>
         <RightSide>
           <h4>Insira os dados para login:</h4>
           <Form onSubmit={handleSubmit(onSubmit)}>
-            <TextField variant="standard" type="text" placeholder="Email" {...register("email", {required: true, pattern: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g})} />
-            <TextField variant="standard" type="password" placeholder="Senha" {...register("senha", {required: true})} />
+            <Input id="email" type="text" placeholder="Email" {...register("email", {required: true, pattern: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g})} />
+            <Input type="password" placeholder="Senha" {...register("senha", {required: true})} />
             {
               (!isLoading) ? (
                 <Button variant="contained" type="submit">Acessar</Button>
@@ -64,6 +80,9 @@ export function Login() {
               )
             }
           </Form>
+          <SmallText>
+            Se você não possuir uma credencial de acesso, entre em contato com a <b>Prefeitura Municipal de Itabirito</b> e solicite o credenciamento.
+          </SmallText>
         </RightSide>
       </LoginContainer>
     </LoginPage>
