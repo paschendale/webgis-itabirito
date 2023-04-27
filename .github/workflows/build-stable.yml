@@ -1,4 +1,4 @@
-name: Build Backend 
+name: Version, Build and Publish - Stable
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  docker:
+  build:
     runs-on: ubuntu-latest
     steps:
       - 
@@ -34,6 +34,14 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          file: Dockerfile.frontend
+          tags:  |
+            paschendale/webgis-itabirito-frontend:stable
       -
         name: Build and push
         uses: docker/build-push-action@v3
