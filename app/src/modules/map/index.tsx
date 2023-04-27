@@ -141,19 +141,27 @@ function Map() {
 
     try {
       
-      var response = await api.get(`/map/${projectId}?${queryParams}`)
+      var response = await api.get(`/map/info/${projectId}?${queryParams}`)
   
       var featureInfo = response.data
   
       setIsLoadingInfoPanel(false)   
       setFeatures(featureInfo.features)
       return featureInfo
-    } catch (error) {
+    } catch (error: any) {
       
-      toastError('Ocorreu um erro ao tentar obter as feições no local selecionado.')
       setIsLoadingInfoPanel(false)   
       setFeatures([])
-      return null
+      
+      if (error.response.status === 401) {
+          
+        toastError('O usuário não possui credenciais válidas para realizar esta operação.')
+      } else {
+
+        toastError('Ocorreu um erro ao tentar obter as feições no local selecionado.')
+      }
+
+      throw error
     }
 
   }

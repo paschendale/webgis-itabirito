@@ -156,8 +156,42 @@ export async function getMapController(req: Request, res: Response) {
 }
 
 export async function getFeatureInfoController(req: Request, res: Response) {
+  
+  const{ apikey } = req.headers
+
+  if (apikey) {
+
+    try {
+      
+      const auth = await authenticateService(apikey as string)
+  
+      var scope = auth.scopes
+    } catch (error) {
+      
+      throw error
+    }
+  } else {
+
+    scope = ''
+  }
 
   try {
+
+    const catalog = await getCatalog(req.header)
+
+    var filteredCatalog = catalog.data
+
+    filteredCatalog.projects = catalog
+      .data
+      .projects
+      .filter((project: any) => {
+        return (project.description.split(',').some((value: any) => scope.includes(value)) || project.description === '')
+      })
+
+    if(!filteredCatalog.projects.map((e:any)=> e.id).includes(req.params.projectId)) {
+
+      return res.status(401).send({message: 'Credenciais de acesso não permitem esta operação'})
+    }
 
     const response = await getMap(req.params.projectId,req.query)
 
