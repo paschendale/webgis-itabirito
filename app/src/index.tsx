@@ -4,6 +4,7 @@ import { Switch, Route, BrowserRouter, Redirect} from "react-router-dom";
 import './index.css';
 import Map from './modules/map'
 import Geoportal from './pages/geoportal';
+import { Login } from './pages/login/login';
 // import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(
@@ -22,6 +23,9 @@ root.render(
         </Route>
         <Route path="/map">
           <Map />
+        </Route>
+        <Route path="/login">
+          <Login />
         </Route>
       </Switch>
     </BrowserRouter>

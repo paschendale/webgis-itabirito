@@ -52,9 +52,17 @@ function Map() {
         )
     
         return projectSettings.data
-      } catch (error) {
-        
-        toastError('Ocorreu um erro ao tentar obter as configurações do projeto.')
+      } catch (error:any) {
+
+        if (error.response.status === 401) {
+          
+          toastError('O usuário não possui credenciais válidas para acessar este projeto.')
+        } else {
+
+          toastError('Ocorreu um erro ao tentar obter as configurações do projeto.')
+        }
+
+        throw error
       }
     }
     
@@ -65,6 +73,7 @@ function Map() {
       setLayers(settings.layers.Layer)
       setProjectSettings(settings)
     })
+    .catch((error: any) => null)
   },[projectId])
 
   function makeLayers(layers: any, order: string) {
@@ -132,19 +141,27 @@ function Map() {
 
     try {
       
-      var response = await api.get(`/map/${projectId}?${queryParams}`)
+      var response = await api.get(`/map/info/${projectId}?${queryParams}`)
   
       var featureInfo = response.data
   
       setIsLoadingInfoPanel(false)   
       setFeatures(featureInfo.features)
       return featureInfo
-    } catch (error) {
+    } catch (error: any) {
       
-      toastError('Ocorreu um erro ao tentar obter as feições no local selecionado.')
       setIsLoadingInfoPanel(false)   
       setFeatures([])
-      return null
+      
+      if (error.response.status === 401) {
+          
+        toastError('O usuário não possui credenciais válidas para realizar esta operação.')
+      } else {
+
+        toastError('Ocorreu um erro ao tentar obter as feições no local selecionado.')
+      }
+
+      throw error
     }
 
   }

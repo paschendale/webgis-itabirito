@@ -1,15 +1,20 @@
 import { useEffect, useState } from "react"
 import { api } from "../../services/api"
-import { GeoportalContainer, GeoportalViewport, Navbar, NavbarBrand, ServicesContainer, ServicesTitleContainer, NavbarLogo, NavbarTitle } from "./styles"
+import { GeoportalContainer, GeoportalViewport, Navbar, NavbarBrand, ServicesContainer, ServicesTitleContainer, NavbarLogo, NavbarTitle, NavbarMenuItem, NavbarMenu } from "./styles"
 import ServiceCard from "../../components/serviceCard"
 import brasao from "./../../assets/brasao.png"
 import { ToastContainer, toast } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';
+import { BiUserCircle } from "react-icons/bi"
 import { Card, CardTitle, ServiceCardContainer } from "../../components/serviceCard/styles"
+import { useHistory } from "react-router"
 
 export default function Geoportal() {
   const[webgisList,setWebgisList] = useState<Array<any>>([])
   const[isLoadingWebgisList,setIsLoadingWebgisList] = useState(true)
+  const[authenticatedUser,setAuthenticatedUser] = useState('')
+
+  const history = useHistory()
 
   async function getCatalog() {
 
@@ -17,6 +22,42 @@ export default function Geoportal() {
 
     return response.data
   }
+
+  async function verifyApikey(apiKey: string) {
+    
+    try {
+        
+      let auth = await api.post('/auth',{
+        apikey: apiKey
+      })
+
+      return auth.data
+    } catch (error) {
+      
+      console.log(error)
+      throw error
+    }
+  }
+
+  useEffect(() => {
+
+    let login = localStorage.getItem(`webgisLogin`)
+    let parsedLogin = JSON.parse(login || '{}')
+
+    if (parsedLogin.name) {
+  
+      verifyApikey(parsedLogin.apikey).then((auth: any) => {
+
+        if(auth.name) {
+
+          setAuthenticatedUser( auth.name )
+        } else {
+          
+          setAuthenticatedUser( '' )
+        }
+      })
+    }
+  },[])
 
   useEffect(() => {
 
@@ -38,7 +79,13 @@ export default function Geoportal() {
       setWebgisList([{title: 'Não foi possível carregar os WebGIS'}])
       setIsLoadingWebgisList(false)
     })
-  },[])
+  },[authenticatedUser])
+
+  function handleLogout() {
+
+    localStorage.removeItem(`webgisLogin`)
+    setAuthenticatedUser('')
+  }
 
   return (
     <>
@@ -49,6 +96,24 @@ export default function Geoportal() {
             &nbsp; PREFEITURA DE <b> ITABIRITO</b> | GEOPORTAL
           </NavbarTitle>
         </NavbarBrand>
+        <NavbarMenu>
+          {
+            (!authenticatedUser || authenticatedUser === '') ? (
+              <NavbarMenuItem onClick={() => history.push('/login')}>
+                Login
+              </NavbarMenuItem>
+            ) : (
+              <>
+                <NavbarMenuItem>
+                  <BiUserCircle/> &nbsp; {authenticatedUser}
+                </NavbarMenuItem>
+                <NavbarMenuItem onClick={() => handleLogout()}>
+                  Sair
+                </NavbarMenuItem>
+              </>
+            )
+          }
+        </NavbarMenu>
       </Navbar>
       <GeoportalContainer>
         <GeoportalViewport>
@@ -74,7 +139,7 @@ export default function Geoportal() {
                     if ((e.id) !== undefined) {
 
                       return (
-                        <ServiceCard key={e.id} title={e.title} backgroundColor="#590404" color={e.color || "white"} url={`/map/${e.id}`}/>
+                        <ServiceCard key={e.id} title={e.title} backgroundColor={(e.description === '') ? "#590404" : "#ff6600"} color={e.color || "white"} url={`/map/${e.id}`}/>
                       )
                     } else {
 
