@@ -12,7 +12,7 @@ import { useHistory } from "react-router"
 export default function Geoportal() {
   const[webgisList,setWebgisList] = useState<Array<any>>([])
   const[isLoadingWebgisList,setIsLoadingWebgisList] = useState(true)
-  const[authenticatedUser,setAuthenticatedUser] = useState()
+  const[authenticatedUser,setAuthenticatedUser] = useState('')
 
   const history = useHistory()
 
@@ -22,6 +22,42 @@ export default function Geoportal() {
 
     return response.data
   }
+
+  async function verifyApikey(apiKey: string) {
+    
+    try {
+        
+      let auth = await api.post('/auth',{
+        apikey: apiKey
+      })
+
+      return auth.data
+    } catch (error) {
+      
+      console.log(error)
+      throw error
+    }
+  }
+
+  useEffect(() => {
+
+    let login = localStorage.getItem(`webgisLogin`)
+    let parsedLogin = JSON.parse(login || '{}')
+
+    if (parsedLogin.name) {
+  
+      verifyApikey(parsedLogin.apikey).then((auth: any) => {
+
+        if(auth.name) {
+
+          setAuthenticatedUser( auth.name )
+        } else {
+          
+          setAuthenticatedUser( '' )
+        }
+      })
+    }
+  },[])
 
   useEffect(() => {
 
@@ -45,6 +81,12 @@ export default function Geoportal() {
     })
   },[])
 
+  function handleLogout() {
+
+    localStorage.removeItem(`webgisLogin`)
+    setAuthenticatedUser('')
+  }
+
   return (
     <>
       <Navbar>
@@ -56,14 +98,19 @@ export default function Geoportal() {
         </NavbarBrand>
         <NavbarMenu>
           {
-            (!authenticatedUser) ? (
+            (!authenticatedUser || authenticatedUser === '') ? (
               <NavbarMenuItem onClick={() => history.push('/login')}>
                 Login
               </NavbarMenuItem>
             ) : (
-              <NavbarMenuItem>
-                <BiUserCircle/> &nbsp; {authenticatedUser}
-              </NavbarMenuItem>
+              <>
+                <NavbarMenuItem>
+                  <BiUserCircle/> &nbsp; {authenticatedUser}
+                </NavbarMenuItem>
+                <NavbarMenuItem onClick={() => handleLogout()}>
+                  Sair
+                </NavbarMenuItem>
+              </>
             )
           }
         </NavbarMenu>
