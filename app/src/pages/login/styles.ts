@@ -6,6 +6,7 @@ export const LoginPage = styled.div`
   width: 100vw;
   height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 
@@ -107,5 +108,22 @@ export const Input = styled.input`
     border-color: whitesmoke;
     color: whitesmoke;
     background-color: rgba(0,0,0,0);
+  }
+`
+
+export const LogoContainer = styled.div`
+  display: flex;
+  margin-bottom: 10%;
+  align-items: center;
+`
+
+export const Logo = styled.img`
+  height: 60px;
+`
+export const BrandContainer = styled.div`
+  font-size: 200%;
+
+  @media (prefers-color-scheme: dark) {
+    color: whitesmoke;
   }
 `

@@ -1,4 +1,4 @@
-import { LoginPage, LoginContainer, LeftSide, RightSide, Form, Input, Text, SmallText } from "./styles";
+import { LoginPage, LoginContainer, LeftSide, RightSide, Form, Input, Text, SmallText, BrandContainer, Logo, LogoContainer } from "./styles";
 import { useForm } from 'react-hook-form';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -8,6 +8,7 @@ import { useState } from "react";
 import ContentLoader from "react-content-loader";
 import { Box, createTheme } from "@mui/system";
 import { useMediaQuery } from "@mui/material";
+import brasao from "./../../assets/brasao.png"
 
 export function Login() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -40,6 +41,12 @@ export function Login() {
 
   return (
     <LoginPage>
+      <LogoContainer>
+        <Logo src={brasao} alt="Logo da prefeitura" />
+        <BrandContainer>
+            &nbsp; PREFEITURA DE <b> ITABIRITO</b> | GEOPORTAL
+        </BrandContainer>
+      </LogoContainer>
       <LoginContainer>
         <LeftSide>
           <Text>
