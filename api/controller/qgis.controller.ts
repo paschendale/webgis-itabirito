@@ -13,10 +13,7 @@ export async function getCatalogController(req: Request, res: Response) {
 
   const{ apikey } = req.headers
 
-  if (!apikey) {
-
-    return res.status(401).json({message: 'Credenciais de autenticação não foram fornecidas'})
-  } else {
+  if (apikey) {
 
     try {
       
@@ -27,6 +24,9 @@ export async function getCatalogController(req: Request, res: Response) {
       
       throw error
     }
+  } else {
+
+    scope = ''
   }
 
   try {

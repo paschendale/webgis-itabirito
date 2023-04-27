@@ -79,7 +79,7 @@ export default function Geoportal() {
       setWebgisList([{title: 'Não foi possível carregar os WebGIS'}])
       setIsLoadingWebgisList(false)
     })
-  },[])
+  },[authenticatedUser])
 
   function handleLogout() {
 
