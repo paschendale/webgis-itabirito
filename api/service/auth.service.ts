@@ -9,7 +9,15 @@ export async function loginService(email: string, password: string) {
       password: password
     })
 
-    return login
+    const response = {
+      id_user: login.data.user.id_user,
+      name: login.data.user.name,
+      email: login.data.user.email,
+      scopes: login.data.user.user_scope.map((e: any) => e.scope.description),
+      apikey: login.data.apikey
+    }
+
+    return response
   } catch (error) {
     
     throw error
@@ -24,7 +32,16 @@ export async function authenticateService(apikey: string) {
       apikey: apikey
     })
 
-    return authenticate
+    
+    const response = {
+      id_user: authenticate.data.id_user,
+      name: authenticate.data.name,
+      email: authenticate.data.email,
+      scopes: authenticate.data.user_scope.map((e: any) => e.scope.description),
+      apikey: apikey
+    }
+    
+    return response
   } catch (error) {
     
     throw error

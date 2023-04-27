@@ -1,3 +1,4 @@
+import { authenticateService } from "../service/auth.service";
 import { getCatalog, getMap, getProjectSettings } from "./../service/qgis.service"
 import { consoleLog, parseXML } from "./../utils"
 import { Request, Response } from "express";
@@ -10,11 +11,39 @@ function errorTreatment(e: any) {
 
 export async function getCatalogController(req: Request, res: Response) {
 
+  const{ apikey } = req.headers
+
+  if (!apikey) {
+
+    return res.status(401).json({message: 'Credenciais de autenticação não foram fornecidas'})
+  } else {
+
+    try {
+      
+      const auth = await authenticateService(apikey as string)
+  
+      var scope = auth.scopes
+    } catch (error) {
+      
+      throw error
+    }
+  }
+
   try {
     
     const catalog = await getCatalog(req.header)
+
+    var filteredCatalog = catalog.data
+
+    filteredCatalog.projects = catalog
+      .data
+      .projects
+      .filter((project: any) => {
+        return (project.description.split(',').some((value: any) => scope.includes(value)) || project.description === '')
+      })
+    filteredCatalog.projects_count = filteredCatalog.projects.length
     
-    return res.status(catalog.status).send(catalog.data)
+    return res.status(catalog.status).send(filteredCatalog)
 
   } catch (error: any) {
 
@@ -27,7 +56,7 @@ export async function getCatalogController(req: Request, res: Response) {
     }
 
     return res.status(responseStatus).send(
-      error.response.data
+      error
     )
   }
 }

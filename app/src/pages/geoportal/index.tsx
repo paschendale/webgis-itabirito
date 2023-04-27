@@ -139,7 +139,7 @@ export default function Geoportal() {
                     if ((e.id) !== undefined) {
 
                       return (
-                        <ServiceCard key={e.id} title={e.title} backgroundColor="#590404" color={e.color || "white"} url={`/map/${e.id}`}/>
+                        <ServiceCard key={e.id} title={e.title} backgroundColor={(e.description === '') ? "#590404" : "#ff6600"} color={e.color || "white"} url={`/map/${e.id}`}/>
                       )
                     } else {
 

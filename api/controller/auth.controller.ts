@@ -17,15 +17,7 @@ export async function loginController(req: Request, res: Response) {
 
   try {
     
-    const login = await loginService(email,password)
-
-    const response = {
-      id_user: login.data.user.id_user,
-      name: login.data.user.name,
-      email: login.data.user.email,
-      scopes: login.data.user.user_scope.map((e: any) => e.scope.description),
-      apikey: login.data.apikey
-    }
+    const response = await loginService(email,password)
 
     return res.send(response)
   } catch (error) {
@@ -46,15 +38,7 @@ export async function authenticateController(req: Request, res: Response) {
 
   try {
     
-    const authenticate = await authenticateService(apikey)
-
-    const response = {
-      id_user: authenticate.data.id_user,
-      name: authenticate.data.name,
-      email: authenticate.data.email,
-      scopes: authenticate.data.user_scope.map((e: any) => e.scope.description),
-      apikey: apikey
-    }
+    const response = await authenticateService(apikey)
 
     return res.send(response)
   } catch (error) {
