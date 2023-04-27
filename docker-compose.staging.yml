@@ -1,6 +1,20 @@
 version: '3'
 
 services:
+  webgis-auth-staging:
+    image: paschendale/scope-auth
+    hostname: webgis-auth
+    environment:
+      - DATABASE_URL=
+      - AUTH_MASTER_EMAIL=
+      - AUTH_MASTER_PASSWORD=
+      - AUTH_SECRET=
+    ports:
+      - 111:3000
+    labels:
+      - "com.centurylinklabs.watchtower.scope=webgis.itabirito.staging"
+
+
   webgis-proxy-staging:
     image: nginx
     volumes:
@@ -26,6 +40,7 @@ services:
       - PG_PASSWORD=
       - PG_PORT=
       - QGIS_SERVER_URL=https://qgis.itabirito.genteufv.com.br/
+      - AUTH_SERVER_URL=https://staging.auth.itabirito.genteufv.com.br/
     labels:
       - "com.centurylinklabs.watchtower.scope=webgis.itabirito.staging"
 
@@ -34,6 +49,6 @@ services:
     container_name: webgis-watchtower-staging
     volumes:
       - //var/run/docker.sock:/var/run/docker.sock
-    command: --interval 300 webgis-frontend-staging webgis-backend-staging --scope webgis.itabirito.staging
+    command: --interval 300 webgis-frontend-staging webgis-backend-staging webgis-auth --scope webgis.itabirito.staging
     labels:
       - "com.centurylinklabs.watchtower.scope=webgis.itabirito.staging"
