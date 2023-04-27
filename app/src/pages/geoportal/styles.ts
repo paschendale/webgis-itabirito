@@ -74,6 +74,7 @@ export const Navbar = styled.div`
   height: 70px;
   top: 0px;
   display: flex;
+  justify-content: space-between;
   color: black !important;
   -webkit-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.2);
   -moz-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.2);
@@ -110,4 +111,25 @@ export const NavbarTitle = styled.h3`
 
 export const NavbarLogo = styled.img`
   height: 70%;
+`
+
+export const NavbarMenu = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-right: 20px;
+
+  @media (prefers-color-scheme: dark) {
+    color: rgb(180,180,180);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.40), rgba(0, 0, 0, 0.40)), url(${denim});
+  }
+`
+
+export const NavbarMenuItem = styled.p`
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 10px;
+  color: inherit;
 `

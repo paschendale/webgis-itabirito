@@ -1,15 +1,20 @@
 import { useEffect, useState } from "react"
 import { api } from "../../services/api"
-import { GeoportalContainer, GeoportalViewport, Navbar, NavbarBrand, ServicesContainer, ServicesTitleContainer, NavbarLogo, NavbarTitle } from "./styles"
+import { GeoportalContainer, GeoportalViewport, Navbar, NavbarBrand, ServicesContainer, ServicesTitleContainer, NavbarLogo, NavbarTitle, NavbarMenuItem, NavbarMenu } from "./styles"
 import ServiceCard from "../../components/serviceCard"
 import brasao from "./../../assets/brasao.png"
 import { ToastContainer, toast } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';
+import { BiUserCircle } from "react-icons/bi"
 import { Card, CardTitle, ServiceCardContainer } from "../../components/serviceCard/styles"
+import { useHistory } from "react-router"
 
 export default function Geoportal() {
   const[webgisList,setWebgisList] = useState<Array<any>>([])
   const[isLoadingWebgisList,setIsLoadingWebgisList] = useState(true)
+  const[authenticatedUser,setAuthenticatedUser] = useState()
+
+  const history = useHistory()
 
   async function getCatalog() {
 
@@ -49,6 +54,19 @@ export default function Geoportal() {
             &nbsp; PREFEITURA DE <b> ITABIRITO</b> | GEOPORTAL
           </NavbarTitle>
         </NavbarBrand>
+        <NavbarMenu>
+          {
+            (!authenticatedUser) ? (
+              <NavbarMenuItem onClick={() => history.push('/login')}>
+                Login
+              </NavbarMenuItem>
+            ) : (
+              <NavbarMenuItem>
+                <BiUserCircle/> &nbsp; {authenticatedUser}
+              </NavbarMenuItem>
+            )
+          }
+        </NavbarMenu>
       </Navbar>
       <GeoportalContainer>
         <GeoportalViewport>
