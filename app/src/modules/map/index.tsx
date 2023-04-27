@@ -52,9 +52,17 @@ function Map() {
         )
     
         return projectSettings.data
-      } catch (error) {
-        
-        toastError('Ocorreu um erro ao tentar obter as configurações do projeto.')
+      } catch (error:any) {
+
+        if (error.response.status === 401) {
+          
+          toastError('O usuário não possui credenciais válidas para acessar este projeto.')
+        } else {
+
+          toastError('Ocorreu um erro ao tentar obter as configurações do projeto.')
+        }
+
+        throw error
       }
     }
     
@@ -65,6 +73,7 @@ function Map() {
       setLayers(settings.layers.Layer)
       setProjectSettings(settings)
     })
+    .catch((error: any) => null)
   },[projectId])
 
   function makeLayers(layers: any, order: string) {
