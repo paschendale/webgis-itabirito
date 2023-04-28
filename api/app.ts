@@ -1,7 +1,8 @@
 import express from "express";
 import cors from "cors";
-import { consoleLog } from "./utils"
+import { consoleLog, makeHealthCheck } from "./utils"
 import { routes } from "./routes/routes";
+import { authServerUrl, qgisServerUrl } from "./environments";
 
 const app = express();
 var bodyParser = require('body-parser');
@@ -14,3 +15,7 @@ app.use(routes);
 
 app.listen(2001, () => consoleLog("API inicializada na porta 2001"));
 
+// health check to services
+
+makeHealthCheck(qgisServerUrl)
+makeHealthCheck(`${authServerUrl}docs`)
