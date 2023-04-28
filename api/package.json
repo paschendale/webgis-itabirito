@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node-dev app.ts"
+    "start": "ts-node-dev app.ts",
+    "start:prod": "ts-node --transpile-only app.ts"
   },
   "author": "Victor Marotta",
   "license": "ISC",

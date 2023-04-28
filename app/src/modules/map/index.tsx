@@ -7,7 +7,7 @@ import InfoPanel from '../info-panel';
 import { ButtonsContainer, Container, LeftSidePanel, LeftSidePanelSwitcher, MiddlePanel, RightSidePanel, RightSidePanelSwitcher, Version } from './styles';
 import { api } from '../../services/api';
 import { LeafletMouseEvent } from 'leaflet';
-import { generateQueryParams } from '../../utils';
+import { generateQueryParams, toastError } from '../../utils';
 import { FaCaretLeft, FaCaretRight, FaGithub, FaRulerCombined, FaStreetView } from 'react-icons/fa';
 import MapButton from '../../components/mapButton';
 import PanoramicViewer from '../../components/panoramic-viewer';
@@ -16,6 +16,8 @@ import pj from "./../../../package.json"
 import 'proj4';
 import 'proj4leaflet';
 import SelectedFeatures from './components/selectedFeatures';
+import { ToastContainer } from "react-toastify"
+import 'react-toastify/dist/ReactToastify.css';
 
 interface Layer {
   '@_queryable': string;
@@ -43,11 +45,25 @@ function Map() {
 
     async function getProjectSettings() {
     
-      const projectSettings = await api.get(
-        `/settings/${projectId}` 
-      )
-  
-      return projectSettings.data
+      try {
+        
+        const projectSettings = await api.get(
+          `/settings/${projectId}` 
+        )
+    
+        return projectSettings.data
+      } catch (error:any) {
+
+        if (error.response.status === 401) {
+          
+          toastError('O usuário não possui credenciais válidas para acessar este projeto.')
+        } else {
+
+          toastError('Ocorreu um erro ao tentar obter as configurações do projeto.')
+        }
+
+        throw error
+      }
     }
     
     getProjectSettings()
@@ -57,6 +73,7 @@ function Map() {
       setLayers(settings.layers.Layer)
       setProjectSettings(settings)
     })
+    .catch((error: any) => null)
   },[projectId])
 
   function makeLayers(layers: any, order: string) {
@@ -122,13 +139,31 @@ function Map() {
 
     var queryParams = generateQueryParams(params)
 
-    var response = await api.get(`/map/${projectId}?${queryParams}`)
+    try {
+      
+      var response = await api.get(`/map/info/${projectId}?${queryParams}`)
+  
+      var featureInfo = response.data
+  
+      setIsLoadingInfoPanel(false)   
+      setFeatures(featureInfo.features)
+      return featureInfo
+    } catch (error: any) {
+      
+      setIsLoadingInfoPanel(false)   
+      setFeatures([])
+      
+      if (error.response.status === 401) {
+          
+        toastError('O usuário não possui credenciais válidas para realizar esta operação.')
+      } else {
 
-    var featureInfo = response.data
+        toastError('Ocorreu um erro ao tentar obter as feições no local selecionado.')
+      }
 
-    setIsLoadingInfoPanel(false)   
-    setFeatures(featureInfo.features)
-    return featureInfo
+      throw error
+    }
+
   }
 
   function switchLeftPanel() {
@@ -169,60 +204,63 @@ function Map() {
   };
 
   return ( 
-    <Container>
-      <LeftSidePanel display={displayLeftSidePanel}>
-        <InfoPanel 
-          features={features} 
-          isLoading={isLoadingInfoPanel}
-          map={mapRef.current}
-        />
-      </LeftSidePanel>
-      <MiddlePanel>
-        <ButtonsContainer>
-          <MapButton onClick={measureTool}><FaRulerCombined/></MapButton>
-          <MapButton onClick={streetView}>
-            <FaStreetView />
-          </MapButton>
-        </ButtonsContainer>
-        <LeftSidePanelSwitcher onClick={switchLeftPanel}>
-            {(displayLeftSidePanel)? (<FaCaretLeft/>) : (<FaCaretRight/> )}
-        </LeftSidePanelSwitcher>
-        <SearchBox 
-          setFeatures={setFeatures}
-          setLoading={setIsLoadingInfoPanel}
-          setDisplayLeftSidePanel={setdisplayLeftSidePanel}
-          layers={layers}
-        />
-        <MapContainer 
-          center={[-20.25554, -43.80376]} 
-          zoom={17} 
-          scrollWheelZoom={true}
-          attributionControl={false}
-          ref={mapRef}
-        >  
-          <MapHandlers/>
-          {layers && <>
-            {
-              makeLayers(layers,layerOrder)
-            }
-          </>}
-          <SelectedFeatures
-            features={features}
-          />   
-        </MapContainer>
-        <Version>
-          <div style={{padding: 4}}>
-            webgis-itabirito:v.{pj.version} <a style={{color: 'inherit'}} href='https://github.com/paschendale/webgis-itabirito' target={'_blank'} rel="noreferrer"><span style={{color: 'inherit'}}><FaGithub/></span></a>
-          </div>
-        </Version>
-        <RightSidePanelSwitcher onClick={switchRightPanel}>
-            {(displayRightSidePanel)? (<FaCaretRight/> ) : (<FaCaretLeft/>)}
-        </RightSidePanelSwitcher>
-      </MiddlePanel>
-      <RightSidePanel display={displayRightSidePanel}>
-          <PanoramicViewer></PanoramicViewer>
-      </RightSidePanel>
-    </Container>
+    <>
+      <Container>
+        <LeftSidePanel display={displayLeftSidePanel}>
+          <InfoPanel 
+            features={features} 
+            isLoading={isLoadingInfoPanel}
+            map={mapRef.current}
+          />
+        </LeftSidePanel>
+        <MiddlePanel>
+          <ButtonsContainer>
+            <MapButton onClick={measureTool}><FaRulerCombined/></MapButton>
+            <MapButton onClick={streetView}>
+              <FaStreetView />
+            </MapButton>
+          </ButtonsContainer>
+          <LeftSidePanelSwitcher onClick={switchLeftPanel}>
+              {(displayLeftSidePanel)? (<FaCaretLeft/>) : (<FaCaretRight/> )}
+          </LeftSidePanelSwitcher>
+          <SearchBox 
+            setFeatures={setFeatures}
+            setLoading={setIsLoadingInfoPanel}
+            setDisplayLeftSidePanel={setdisplayLeftSidePanel}
+            layers={layers}
+          />
+          <MapContainer 
+            center={[-20.25554, -43.80376]} 
+            zoom={17} 
+            scrollWheelZoom={true}
+            attributionControl={false}
+            ref={mapRef}
+          >  
+            <MapHandlers/>
+            {layers && <>
+              {
+                makeLayers(layers,layerOrder)
+              }
+            </>}
+            <SelectedFeatures
+              features={features}
+            />   
+          </MapContainer>
+          <Version>
+            <div style={{padding: 4}}>
+              webgis-itabirito:v.{pj.version} <a style={{color: 'inherit'}} href='https://github.com/paschendale/webgis-itabirito' target={'_blank'} rel="noreferrer"><span style={{color: 'inherit'}}><FaGithub/></span></a>
+            </div>
+          </Version>
+          <RightSidePanelSwitcher onClick={switchRightPanel}>
+              {(displayRightSidePanel)? (<FaCaretRight/> ) : (<FaCaretLeft/>)}
+          </RightSidePanelSwitcher>
+        </MiddlePanel>
+        <RightSidePanel display={displayRightSidePanel}>
+            <PanoramicViewer></PanoramicViewer>
+        </RightSidePanel>
+      </Container>
+      <ToastContainer />
+    </>
   );
 }
 

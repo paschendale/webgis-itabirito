@@ -7,4 +7,4 @@ RUN yarn
 
 EXPOSE 2001
 
-CMD yarn start 
+CMD yarn start:prod
