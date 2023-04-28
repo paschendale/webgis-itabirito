@@ -9,9 +9,10 @@ import ContentLoader from "react-content-loader";
 import { Box, createTheme } from "@mui/system";
 import { useMediaQuery } from "@mui/material";
 import brasao from "./../../assets/brasao.png"
+import { ToastContainer, toast } from "react-toastify"
+import 'react-toastify/dist/ReactToastify.css';
 
 export function Login() {
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
   const { register, handleSubmit, formState: { errors } } = useForm();
 
@@ -20,6 +21,8 @@ export function Login() {
   const history = useHistory()
 
   async function onSubmit(data: any) {
+
+    setIsLoading(true)
 
     try {
       
@@ -30,17 +33,29 @@ export function Login() {
 
         localStorage.setItem(`webgisLogin`,JSON.stringify(login.data))
         
+        setIsLoading(false)
+        toast.success('Autenticação realizada com sucesso')
         history.push('/geoportal')
       })
 
-    } catch (error) {
+    } catch (error: any) {
       
-      console.log(error)
+      setIsLoading(false)
+        
+      if (error.response.status === 401) {
+
+        toast.error('Usuário ou senha inválidos')
+      } else {
+
+        toast.error('Não foi possível realizar a autenticação do usuário')
+        console.log(error)
+      }
     }
   };
 
   return (
     <LoginPage>
+      <ToastContainer />
       <LogoContainer>
         <Logo src={brasao} alt="Logo da prefeitura" />
         <BrandContainer>
@@ -72,18 +87,8 @@ export function Login() {
               (!isLoading) ? (
                 <Button variant="contained" type="submit">Acessar</Button>
               ) : (
-                <Box sx={{width: 195, height: 30, borderRadius: '5px'}}>
-
-                  <ContentLoader 
-                    speed={1}
-                    height={30}
-                    width={195}
-                    backgroundColor="#cccccc"
-                    foregroundColor="#e0e0e0"
-                  >
-                    <rect x="0" y="0" width="195" height="30"/> 
-                  </ContentLoader>
-                </Box>
+                
+                <Button disabled variant="contained" type="submit">Acessando</Button>
               )
             }
           </Form>
