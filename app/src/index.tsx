@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Switch, Route, BrowserRouter, Redirect} from "react-router-dom";
 import './index.css';
-import Map from './modules/map'
+import Map from './pages/webgis'
 import Geoportal from './pages/geoportal';
 import { Login } from './pages/login/login';
 // import reportWebVitals from './reportWebVitals';

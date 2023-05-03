@@ -139,3 +139,63 @@ export const Version = styled.div`
     background-color: rgb(0,0,0,0.8);
   }
 `
+
+export const MapContainer = styled.div `
+  width: 100%;
+  height: 100%;
+  
+  @media (prefers-color-scheme: dark) {
+    color: rgb(180,180,180);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.50), rgba(0, 0, 0, 0.50)), url(${denim});
+  }
+
+  .map {
+    height: 100%;
+  }
+
+  .ol-control {
+    color: black;
+    background-color: whitesmoke;
+    border: none;    
+    box-shadow: rgba(0, 0, 0, 0.5) 2px 2px 2px 0px;
+    border-radius: 4px;
+    padding: 0;
+
+    button {
+      cursor: pointer;
+      pointer-events: all;      
+      background-color: whitesmoke;
+      color: black;
+      border-radius: 4px;
+
+      @media (prefers-color-scheme: dark) {
+        color: rgb(180,180,180);
+        background-image: linear-gradient(rgba(0, 0, 0, 0.50), rgba(0, 0, 0, 0.50)), url(${denim});
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      color: rgb(180,180,180);
+      background-image: linear-gradient(rgba(0, 0, 0, 0.50), rgba(0, 0, 0, 0.50)), url(${denim});
+    }
+  }
+
+  .ol-zoom-out {   
+    margin: 0;
+    border: 1px solid rgba(0,0,0,0.2);  
+    border-top: none;   
+    width: 32px;
+    height: 32px;
+  }
+
+  .ol-zoom-in {    
+    margin: 0;
+    border: 1px solid rgba(0,0,0,0.2);    
+    width: 32px;
+    height: 32px;
+  }
+
+  .ol-attribution {
+    display: none;
+  }
+`

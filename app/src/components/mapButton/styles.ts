@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const Button = styled.div`
+export const Button = styled.div` 
     width: 30px;
     height: 30px;
     display: flex;
