@@ -16,9 +16,6 @@ import {
   EachButton
 } from "./styles"
 import { FaFilePdf,  FaMapMarkerAlt } from 'react-icons/fa';
-import { LatLng, Map, LatLngBoundsExpression } from 'leaflet';
-import proj4 from 'proj4';
-
 import OlMap from 'ol/Map';
 
 interface InfoPaneProps {

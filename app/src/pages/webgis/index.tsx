@@ -1,28 +1,19 @@
-// import { MapContainer, useMapEvents, WMSTileLayer } from 'react-leaflet'
-// import { LeafletMouseEvent } from 'leaflet';
-// import 'leaflet/dist/leaflet.css';
-// import SelectedFeatures from './components/selectedFeatures';
 import './styles.css'
 import { ButtonsContainer, Container, LeftSidePanel, LeftSidePanelSwitcher, MapContainer, MiddlePanel, RightSidePanel, RightSidePanelSwitcher, Version } from './styles';
 import { useEffect, useRef, useState } from "react"
 import SearchBox from '../../modules/searchbox';
 import InfoPanel from '../../modules/info-panel';
 import { api } from '../../services/api';
-import { generateQueryParams, toastError } from '../../utils';
+import { toastError } from '../../utils';
 import { FaCaretLeft, FaCaretRight, FaGithub, FaRulerCombined, FaStreetView } from 'react-icons/fa';
 import PanoramicViewer from '../../components/panoramic-viewer';
 import { useLocation } from 'react-router-dom';
 import pj from "./../../../package.json"
-import 'proj4';
-import 'proj4leaflet';
 import { ToastContainer } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';
 import MapButton from '../../components/mapButton';
-
 import OlMap from 'ol/Map';
 import OlView from 'ol/View';
-import OlLayerTile from 'ol/layer/Tile';
-import OlSourceOsm from 'ol/source/OSM';
 import TileLayer from 'ol/layer/Tile.js';
 import TileWMS from 'ol/source/TileWMS.js';
 import { fromLonLat } from 'ol/proj';
@@ -31,7 +22,6 @@ import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
 import GeoJSON from "ol/format/GeoJSON";
 import Feature from 'ol/Feature';
-
 import 'ol/ol.css';
 import {
   MapComponent
@@ -52,7 +42,6 @@ const map = new OlMap({
 function Map() {
 
   const location = useLocation()
-  const mapRef = useRef<any>(null);
 
   // Project states
   const[projectId,setProjectId] = useState(location.pathname.split('/map/')[1])
@@ -138,8 +127,6 @@ function Map() {
 
   useEffect(() => {
     if (getFeatureInfoUrl) {
-
-      var layers = map.getAllLayers()
 
       getFeatureInfo(getFeatureInfoUrl)
     }
