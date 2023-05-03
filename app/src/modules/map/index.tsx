@@ -15,7 +15,6 @@ import { useLocation } from 'react-router-dom';
 import pj from "./../../../package.json"
 import 'proj4';
 import 'proj4leaflet';
-import SelectedFeatures from './components/selectedFeatures';
 import { ToastContainer } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -242,9 +241,6 @@ function Map() {
                 makeLayers(layers,layerOrder)
               }
             </>}
-            <SelectedFeatures
-              features={features}
-            />   
           </MapContainer>
           <Version>
             <div style={{padding: 4}}>

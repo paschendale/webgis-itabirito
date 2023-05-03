@@ -26,6 +26,11 @@ import OlSourceOsm from 'ol/source/OSM';
 import TileLayer from 'ol/layer/Tile.js';
 import TileWMS from 'ol/source/TileWMS.js';
 import { fromLonLat } from 'ol/proj';
+import { Fill, Stroke, Style } from "ol/style";
+import { Vector as VectorSource } from "ol/source";
+import { Vector as VectorLayer } from "ol/layer";
+import GeoJSON from "ol/format/GeoJSON";
+import Feature from 'ol/Feature';
 
 import 'ol/ol.css';
 import {
@@ -36,6 +41,13 @@ interface Layer {
   '@_queryable': string;
   Name: string,
 }
+
+const map = new OlMap({
+  view: new OlView({
+    center: fromLonLat([-43.80376, -20.25554]),
+    zoom: 14,
+  })
+});
 
 function Map() {
 
@@ -54,23 +66,25 @@ function Map() {
   const[features,setFeatures] = useState<any>()
   const[isLoadingInfoPanel,setIsLoadingInfoPanel] = useState(false)
 
-  const layer = new OlLayerTile({
-    source: new OlSourceOsm()
-  });
-
-  const map = new OlMap({
-    view: new OlView({
-      center: fromLonLat([-43.80376, -20.25554]),
-      zoom: 14,
-    })
-  });
-
   useEffect(() => {
     if(layers && layerOrder) {
 
-      makeLayers(layers,layerOrder)
+      buildQGISLayers(layers,layerOrder)
     }
   },[layers])
+
+  useEffect(() => {
+    if(features) {
+
+      var selectedLayer = buildSelectLayer(features)
+      map.addLayer(selectedLayer)    
+      map.getView().fit(selectedLayer.getSource()?.getExtent()!, { padding: [50, 50, 50, 50], duration: 1000 });
+    }
+  },[features])
+
+  useEffect(() => {
+    map.updateSize()    
+  },[displayLeftSidePanel,displayRightSidePanel])
 
   useEffect(() => {
 
@@ -125,40 +139,77 @@ function Map() {
     console.log('veremos em breve')
   }
 
-  function makeLayers(layers: any, order: string) {
+  function buildQGISLayers(layers: any, order: string) {
 
     const content = order.split(',').map(
       (e,i) => {
         
-        var layer = createLayer(
-          layers.filter((l:any) => (l.Name === e))[0],
-          (i === 0)
-        )
-        return layer
+        var layer = layers.filter((l:any) => (l.Name === e))[0]
+        var baseLayer = (i === 0)
+        
+        if(!baseLayer) {
+          baseLayer = false
+        }
+    
+        var olLayer = new TileLayer({
+          source: new TileWMS({
+            url: `/api/map/${projectId}`,
+            params: {
+              'layers': layer.Name, 
+              'format': baseLayer ? 'image/jpeg' : 'image/png',
+              'maxZoom': 30,
+              'transparent': !baseLayer
+            }
+          }),
+        })
+    
+        map.addLayer(olLayer)
       })
 
     return content
   }
 
-  function createLayer(layer: any, baseLayer?: boolean) {
+  function buildSelectLayer(features: GeoJSON, style?: any) {
 
-    if(!baseLayer) {
-      baseLayer = false
+    function makeGeojson(features: any): any {
+
+      if(features === undefined) {
+        return {
+          type: 'FeatureCollection',
+          features: []
+        }
+      }
+      
+      var geojson = {
+        type: 'FeatureCollection',
+        "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3857" } },
+        features: features
+      }
+    
+      return geojson
     }
 
-    var olLayer = new TileLayer({
-      source: new TileWMS({
-        url: `/api/map/${projectId}`,
-        params: {
-          'layers': layer.Name, 
-          'format': baseLayer ? 'image/jpeg' : 'image/png',
-          'maxZoom': 30,
-          'transparent': !baseLayer
-        }
+    const geojson: Array<Feature> = new GeoJSON().readFeatures(makeGeojson(features));
+  
+    var selectedStyle = new Style({
+      stroke: new Stroke({
+        color: "rgb(255, 208, 0)",
+        width: 3,
+      }),
+      fill: new Fill({
+        color: "rgba(255, 208, 0, 0.35)",
       }),
     })
-
-    map.addLayer(olLayer)
+  
+    const vectorLayer = new VectorLayer({
+      source: new VectorSource({
+        features: geojson,
+      }),
+      zIndex: 10,
+      style: selectedStyle,
+    });
+  
+    return vectorLayer
   }
 
   return ( 
@@ -193,24 +244,6 @@ function Map() {
               map={map}
             />
           </MapContainer>
-          {/* 
-          <MapContainer 
-            center={[-20.25554, -43.80376]} 
-            zoom={17} 
-            scrollWheelZoom={true}
-            attributionControl={false}
-            ref={mapRef}
-          >  
-            <MapHandlers/>
-            {layers && <>
-              {
-                makeLayers(layers,layerOrder)
-              }
-            </>}
-            <SelectedFeatures
-              features={features}
-            />   
-          </MapContainer> */}
           <Version>
             <div style={{padding: 4}}>
               webgis-itabirito:v.{pj.version} <a style={{color: 'inherit'}} href='https://github.com/paschendale/webgis-itabirito' target={'_blank'} rel="noreferrer"><span style={{color: 'inherit'}}><FaGithub/></span></a>
