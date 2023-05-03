@@ -79,9 +79,15 @@ function Map() {
       var selectedFeatures = buildSelectLayer(features)
       map.addLayer(selectedFeatures)    
 
-      if (selectedFeatures.getSource()?.getExtent()) {
-
-        map.getView().fit(selectedFeatures.getSource()?.getExtent()!, { padding: [50, 50, 50, 50], duration: 1000 });
+      try {
+        
+        if (selectedFeatures.getSource()?.getExtent() ) {
+  
+           map.getView().fit(selectedFeatures.getSource()?.getExtent()!, { padding: [50, 50, 50, 50], duration: 1000 });
+        }
+      } catch (error) {
+        
+        console.log('Não foi possível ajustar o mapa nas feições selecionadas',error)
       }
     }
   },[features])
