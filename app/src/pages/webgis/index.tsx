@@ -1,22 +1,22 @@
 import './styles.css'
-import { ButtonsContainer, Container, LeftSidePanel, LeftSidePanelSwitcher, MapContainer, MiddlePanel, RightSidePanel, RightSidePanelSwitcher, Version } from './styles';
+import { ButtonsContainer, Container, CoordinatesContainer, Footer, LeftSidePanel, LeftSidePanelSwitcher, MapContainer, MiddlePanel, RightSidePanel, RightSidePanelSwitcher, VersionContainer } from './styles';
 import { useEffect, useRef, useState } from "react"
 import SearchBox from '../../modules/searchbox';
 import InfoPanel from '../../modules/info-panel';
 import { api } from '../../services/api';
 import { toastError } from '../../utils';
-import { FaCaretLeft, FaCaretRight, FaGithub, FaRulerCombined, FaStreetView } from 'react-icons/fa';
+import { FaCaretLeft, FaCaretRight, FaCaretUp, FaCopy, FaDrawPolygon, FaGithub, FaRegCopy, FaRulerCombined, FaStreetView, FaToolbox } from 'react-icons/fa';
 import PanoramicViewer from '../../components/panoramic-viewer';
 import { useLocation } from 'react-router-dom';
 import pj from "./../../../package.json"
-import { ToastContainer } from "react-toastify"
+import { ToastContainer, toast } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';
 import MapButton from '../../components/mapButton';
 import OlMap from 'ol/Map';
 import OlView from 'ol/View';
 import TileLayer from 'ol/layer/Tile.js';
 import TileWMS from 'ol/source/TileWMS.js';
-import { fromLonLat } from 'ol/proj';
+import { fromLonLat, toLonLat } from 'ol/proj';
 import { Fill, Stroke, Style } from "ol/style";
 import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
@@ -24,7 +24,8 @@ import GeoJSON from "ol/format/GeoJSON";
 import Feature from 'ol/Feature';
 import 'ol/ol.css';
 import {
-  MapComponent
+  MapComponent,
+  MeasureButton,
 } from '@terrestris/react-geo';
 
 interface Layer {
@@ -55,6 +56,11 @@ function Map() {
   const[displayRightSidePanel,setdisplayRightSidePanel] = useState(false)
   const[features,setFeatures] = useState<any>()
   const[isLoadingInfoPanel,setIsLoadingInfoPanel] = useState(false)
+
+  // Tools states & refs
+  const[isEnabledToolbox,setIsEnabledToolbox] = useState(false)
+  const[coordinatesOnDisplay,setCoordinatesOnDisplay] = useState<number[]>()
+  const[coordinatesToClipboard,setCoordinatesToClipboard] = useState<number[]>()
 
   useEffect(() => {
     if(layers && layerOrder) {
@@ -127,17 +133,34 @@ function Map() {
       setLayerOrder(settings.layerDrawingOrder)
       setLayers(settings.layers.Layer)
       setProjectSettings(settings)
+      map.getAllLayers().filter(layer => layer.get('name') === 'react-geo_measure')[0].setZIndex(1000)
     })
     .catch((error: any) => null)
   },[projectId])
 
   useEffect(() => {
-    if (getFeatureInfoUrl) {
+    if (getFeatureInfoUrl && !isEnabledToolbox) {
 
       getFeatureInfo(getFeatureInfoUrl)
     }
-  },[getFeatureInfoUrl])
+  },[getFeatureInfoUrl])  
 
+  useEffect(() => {
+    if (isEnabledToolbox) {
+
+      toast.info('A seleção de feições no mapa foi desabilitada, desative a caixa de ferramentas para ativá-la novamente')
+    }
+  },[isEnabledToolbox])
+
+  useEffect(() => {
+    if(coordinatesToClipboard) {
+      navigator.clipboard.writeText(
+        coordinatesToClipboard[1] + ` , ` + coordinatesToClipboard[0]
+      )
+      toast.info('Coordenadas copiadas para a área de transferência')
+    }
+  },[coordinatesToClipboard])
+  
   async function getFeatureInfo(url: string) {
 
     setIsLoadingInfoPanel(true)  
@@ -169,33 +192,47 @@ function Map() {
     }
   }
 
-  map.on('singleclick', function (e) {
-    const viewResolution = (map.getView().getResolution());
+  map.on('singleclick', (e) => {
 
-    if (map.getAllLayers()[0]) {
+      const viewResolution = (map.getView().getResolution());
 
-      var source = map.getAllLayers()[0].getSource() as TileWMS
-
-      var lyrs = layers?.filter(e => e['@_queryable'] === '1').map(e => e.Name)
-
-      var url = source.getFeatureInfoUrl(
-        e.coordinate,
-        viewResolution!,
-        'EPSG:3857',
-        {
-          info_format: 'application/json',
-          with_geometry: 'true',
-          feature_count: '50000',
-          layers: lyrs?.join(','),
-          query_layers: lyrs?.join(',')
+      var mapLayers = map
+        .getAllLayers()
+        .filter(layer => layer.get('name') !== 'selectedFeatures' && layer.get('name') !== 'react-geo_measure')
+  
+      if (mapLayers[0]) {
+  
+        var source = mapLayers[0].getSource() as TileWMS
+  
+        var lyrs = layers?.filter(e => e['@_queryable'] === '1').map(e => e.Name)
+  
+        var url = source.getFeatureInfoUrl(
+          e.coordinate,
+          viewResolution!,
+          'EPSG:3857',
+          {
+            info_format: 'application/json',
+            with_geometry: 'true',
+            feature_count: '50000',
+            layers: lyrs?.join(','),
+            query_layers: lyrs?.join(',')
+          }
+        )
+  
+        if (url !== getFeatureInfoUrl) {
+          setGetFeatureInfoUrl(url?.replace('api/map','map/info')!)
         }
-      )
-
-      if (url !== getFeatureInfoUrl) {
-        setGetFeatureInfoUrl(url?.replace('api/map','map/info')!)
       }
     }
-  });
+  );
+
+  map.on('pointermove', (e) => {
+
+    if(e.coordinate) {
+      var transformedCoordinates = toLonLat(e.coordinate)
+      setCoordinatesOnDisplay(transformedCoordinates)
+    }
+  })
 
   function switchLeftPanel() {
 
@@ -207,10 +244,6 @@ function Map() {
     setdisplayRightSidePanel(!displayRightSidePanel)
   }
   
-  function measureTool(e: any) {
-    console.log('mediremos em breve')
-  }
-
   function streetView(e: any) {
     console.log('veremos em breve')
   }
@@ -302,12 +335,59 @@ function Map() {
           />
         </LeftSidePanel>
         <MiddlePanel>
-          
           <LeftSidePanelSwitcher onClick={switchLeftPanel}>
               {(displayLeftSidePanel)? (<FaCaretLeft/>) : (<FaCaretRight/> )}
           </LeftSidePanelSwitcher>
+          
           <ButtonsContainer>
-            <MapButton onClick={measureTool}><FaRulerCombined/></MapButton>
+            <MapButton 
+              onClick={() => setIsEnabledToolbox(!isEnabledToolbox)}
+            >
+              <FaToolbox/>
+            </MapButton>
+            {
+              (isEnabledToolbox) ? (
+                <>
+                  <MapButton>
+                    <MeasureButton
+                      name="distance"
+                      map={map}
+                      measureType="line"
+                      clickToDrawText='Clique para medir uma distância'
+                      continueLineMsg='Clique para medir uma distância'
+                      pressed={false}
+                      icon={
+                        <FaRulerCombined/>
+                      }
+                      pressedIcon={
+                        <FaRulerCombined color='green'/>
+                      }
+                      multipleDrawing
+                    >
+                    </MeasureButton>
+                  </MapButton>
+                  <MapButton>
+                    <MeasureButton
+                      name="area"
+                      map={map}
+                      measureType="polygon"
+                      icon={
+                        <FaDrawPolygon/>
+                      }
+                      pressedIcon={
+                        <FaDrawPolygon color='green'/>
+                      }
+                      pressed={false}
+                      clickToDrawText='Clique para medir uma área'
+                      continuePolygonMsg='Clique para medir uma área'
+                      multipleDrawing>
+                    </MeasureButton>
+                  </MapButton>
+                </>
+              ) : (
+                <></>
+              )
+            }
             <MapButton onClick={streetView}>
               <FaStreetView />
             </MapButton>
@@ -323,11 +403,6 @@ function Map() {
               map={map}
             />
           </MapContainer>
-          <Version>
-            <div style={{padding: 4}}>
-              webgis-itabirito:v.{pj.version} <a style={{color: 'inherit'}} href='https://github.com/paschendale/webgis-itabirito' target={'_blank'} rel="noreferrer"><span style={{color: 'inherit'}}><FaGithub/></span></a>
-            </div>
-          </Version>
           <RightSidePanelSwitcher onClick={switchRightPanel}>
               {(displayRightSidePanel)? (<FaCaretRight/> ) : (<FaCaretLeft/>)}
           </RightSidePanelSwitcher>
@@ -336,6 +411,22 @@ function Map() {
             <PanoramicViewer></PanoramicViewer>
         </RightSidePanel>
       </Container>
+      <Footer>
+        <VersionContainer>
+          webgis-itabirito:v.{pj.version} <a style={{color: 'inherit'}} href='https://github.com/paschendale/webgis-itabirito' target={'_blank'} rel="noreferrer"><span style={{color: 'inherit'}}><FaGithub/></span></a>
+        </VersionContainer>
+        {
+          coordinatesOnDisplay && 
+          <CoordinatesContainer>
+            &nbsp;
+            Latitude: { Math.round(coordinatesOnDisplay[1]*10000)/10000 }
+            &nbsp;
+            Longitude: { Math.round(coordinatesOnDisplay[0]*10000)/10000 }
+            &nbsp;&nbsp;&nbsp;
+            <FaRegCopy onClick={() => setCoordinatesToClipboard(coordinatesOnDisplay)} style={{cursor: 'pointer'}}/>
+          </CoordinatesContainer>
+        }
+      </Footer>
       <ToastContainer />
     </>
   );
