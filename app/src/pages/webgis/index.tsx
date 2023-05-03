@@ -59,6 +59,7 @@ function Map() {
   const[projectSettings,setProjectSettings] = useState({})
   const[layerOrder,setLayerOrder] = useState<string>('')
   const[layers,setLayers] = useState<Array<Layer>>()
+  const[getFeatureInfoUrl,setGetFeatureInfoUrl] = useState<string>()
 
   // Info Panel states
   const[displayLeftSidePanel,setdisplayLeftSidePanel] = useState(false)
@@ -74,11 +75,25 @@ function Map() {
   },[layers])
 
   useEffect(() => {
-    if(features) {
 
-      var selectedLayer = buildSelectLayer(features)
-      map.addLayer(selectedLayer)    
-      map.getView().fit(selectedLayer.getSource()?.getExtent()!, { padding: [50, 50, 50, 50], duration: 1000 });
+    var mapLayers = map
+      .getAllLayers()
+      .filter(layer => layer.get('name') === 'selectedFeatures')
+    
+    if(mapLayers.length !== 0) {
+      
+      mapLayers.forEach(layer => map.removeLayer(layer))
+    }
+
+    if(features && features.length !== 0) {
+
+      var selectedFeatures = buildSelectLayer(features)
+      map.addLayer(selectedFeatures)    
+
+      if (selectedFeatures.getSource()?.getExtent()) {
+
+        map.getView().fit(selectedFeatures.getSource()?.getExtent()!, { padding: [50, 50, 50, 50], duration: 1000 });
+      }
     }
   },[features])
 
@@ -121,6 +136,75 @@ function Map() {
     .catch((error: any) => null)
   },[projectId])
 
+  useEffect(() => {
+    if (getFeatureInfoUrl) {
+
+      var layers = map.getAllLayers()
+      console.log("🚀 ~ file: index.tsx:129 ~ useEffect ~ layers:", layers)
+
+      getFeatureInfo(getFeatureInfoUrl)
+    }
+  },[getFeatureInfoUrl])
+
+  async function getFeatureInfo(url: string) {
+
+    setIsLoadingInfoPanel(true)  
+    setdisplayLeftSidePanel(true)
+    
+    try {
+      
+      var response = await api.get(url)
+
+      var featureInfo = response.data
+
+      setIsLoadingInfoPanel(false)   
+      setFeatures(featureInfo.features)
+      return featureInfo
+    } catch (error: any) {
+      
+      setIsLoadingInfoPanel(false)   
+      setFeatures([])
+      
+      if (error.response.status === 401) {
+          
+        toastError('O usuário não possui credenciais válidas para realizar esta operação.')
+      } else {
+
+        toastError('Ocorreu um erro ao tentar obter as feições no local selecionado.')
+      }
+
+      throw error
+    }
+  }
+
+  map.on('singleclick', function (e) {
+    const viewResolution = (map.getView().getResolution());
+
+    if (map.getAllLayers()[0]) {
+
+      var source = map.getAllLayers()[0].getSource() as TileWMS
+
+      var lyrs = layers?.filter(e => e['@_queryable'] === '1').map(e => e.Name)
+
+      var url = source.getFeatureInfoUrl(
+        e.coordinate,
+        viewResolution!,
+        'EPSG:3857',
+        {
+          info_format: 'application/json',
+          with_geometry: 'true',
+          feature_count: '50000',
+          layers: lyrs?.join(','),
+          query_layers: lyrs?.join(',')
+        }
+      )
+
+      if (url !== getFeatureInfoUrl) {
+        setGetFeatureInfoUrl(url?.replace('api/map','map/info')!)
+      }
+    }
+  });
+
   function switchLeftPanel() {
 
     setdisplayLeftSidePanel(!displayLeftSidePanel)
@@ -150,7 +234,7 @@ function Map() {
         if(!baseLayer) {
           baseLayer = false
         }
-    
+
         var olLayer = new TileLayer({
           source: new TileWMS({
             url: `/api/map/${projectId}`,
@@ -203,10 +287,13 @@ function Map() {
   
     const vectorLayer = new VectorLayer({
       source: new VectorSource({
-        features: geojson,
+        features: geojson
       }),
       zIndex: 10,
       style: selectedStyle,
+      properties: {
+        name: 'selectedFeatures'
+      }
     });
   
     return vectorLayer
