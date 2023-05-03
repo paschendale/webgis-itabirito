@@ -96,7 +96,7 @@ export const RightSidePanelSwitcher = styled.div`
 
 export const ButtonsContainer = styled.div`
   margin-top: 80px;
-  margin-left: 10px;
+  margin-left: 8px;
   z-index: 1000;
   position: absolute;
   background: whitesmoke;
@@ -143,9 +143,11 @@ export const Version = styled.div`
 export const MapContainer = styled.div `
   width: 100%;
   height: 100%;
+  text-shadow: 1px 1px 5px #000000;
   
   @media (prefers-color-scheme: dark) {
-    color: rgb(180,180,180);
+    color: whitesmoke;
+    font-weight: 600;
     background-image: linear-gradient(rgba(0, 0, 0, 0.50), rgba(0, 0, 0, 0.50)), url(${denim});
   }
 

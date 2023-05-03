@@ -19,7 +19,7 @@ export async function makeHealthCheck(url: string, pingTime?: number) {
 
     try {
         
-        const check = await axios.get(url, {timeout: 5000})
+        const check = await axios.get(url, {timeout: 10000})
 
         if (check) {
             consoleLog(`${url} is alive`)

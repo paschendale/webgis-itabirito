@@ -5,11 +5,11 @@ import SearchBox from '../../modules/searchbox';
 import InfoPanel from '../../modules/info-panel';
 import { api } from '../../services/api';
 import { toastError } from '../../utils';
-import { FaCaretLeft, FaCaretRight, FaGithub, FaRulerCombined, FaStreetView } from 'react-icons/fa';
+import { FaCaretLeft, FaCaretRight, FaCaretUp, FaDrawPolygon, FaGithub, FaRulerCombined, FaStreetView, FaToolbox } from 'react-icons/fa';
 import PanoramicViewer from '../../components/panoramic-viewer';
 import { useLocation } from 'react-router-dom';
 import pj from "./../../../package.json"
-import { ToastContainer } from "react-toastify"
+import { ToastContainer, toast } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';
 import MapButton from '../../components/mapButton';
 import OlMap from 'ol/Map';
@@ -24,7 +24,8 @@ import GeoJSON from "ol/format/GeoJSON";
 import Feature from 'ol/Feature';
 import 'ol/ol.css';
 import {
-  MapComponent
+  MapComponent,
+  MeasureButton,
 } from '@terrestris/react-geo';
 
 interface Layer {
@@ -55,6 +56,9 @@ function Map() {
   const[displayRightSidePanel,setdisplayRightSidePanel] = useState(false)
   const[features,setFeatures] = useState<any>()
   const[isLoadingInfoPanel,setIsLoadingInfoPanel] = useState(false)
+
+  // Tools states & refs
+  const[isEnabledToolbox,setIsEnabledToolbox] = useState(false)
 
   useEffect(() => {
     if(layers && layerOrder) {
@@ -127,17 +131,25 @@ function Map() {
       setLayerOrder(settings.layerDrawingOrder)
       setLayers(settings.layers.Layer)
       setProjectSettings(settings)
+      map.getAllLayers().filter(layer => layer.get('name') === 'react-geo_measure')[0].setZIndex(1000)
     })
     .catch((error: any) => null)
   },[projectId])
 
   useEffect(() => {
-    if (getFeatureInfoUrl) {
+    if (getFeatureInfoUrl && !isEnabledToolbox) {
 
       getFeatureInfo(getFeatureInfoUrl)
     }
-  },[getFeatureInfoUrl])
+  },[getFeatureInfoUrl])  
 
+  useEffect(() => {
+    if (isEnabledToolbox) {
+
+      toast.info('A seleção de feições no mapa foi desabilitada, desative a caixa de ferramentas para ativá-la novamente')
+    }
+  },[isEnabledToolbox])
+  
   async function getFeatureInfo(url: string) {
 
     setIsLoadingInfoPanel(true)  
@@ -170,32 +182,38 @@ function Map() {
   }
 
   map.on('singleclick', function (e) {
-    const viewResolution = (map.getView().getResolution());
 
-    if (map.getAllLayers()[0]) {
+      const viewResolution = (map.getView().getResolution());
 
-      var source = map.getAllLayers()[0].getSource() as TileWMS
-
-      var lyrs = layers?.filter(e => e['@_queryable'] === '1').map(e => e.Name)
-
-      var url = source.getFeatureInfoUrl(
-        e.coordinate,
-        viewResolution!,
-        'EPSG:3857',
-        {
-          info_format: 'application/json',
-          with_geometry: 'true',
-          feature_count: '50000',
-          layers: lyrs?.join(','),
-          query_layers: lyrs?.join(',')
+      var mapLayers = map
+        .getAllLayers()
+        .filter(layer => layer.get('name') !== 'selectedFeatures' && layer.get('name') !== 'react-geo_measure')
+  
+      if (mapLayers[0]) {
+  
+        var source = mapLayers[0].getSource() as TileWMS
+  
+        var lyrs = layers?.filter(e => e['@_queryable'] === '1').map(e => e.Name)
+  
+        var url = source.getFeatureInfoUrl(
+          e.coordinate,
+          viewResolution!,
+          'EPSG:3857',
+          {
+            info_format: 'application/json',
+            with_geometry: 'true',
+            feature_count: '50000',
+            layers: lyrs?.join(','),
+            query_layers: lyrs?.join(',')
+          }
+        )
+  
+        if (url !== getFeatureInfoUrl) {
+          setGetFeatureInfoUrl(url?.replace('api/map','map/info')!)
         }
-      )
-
-      if (url !== getFeatureInfoUrl) {
-        setGetFeatureInfoUrl(url?.replace('api/map','map/info')!)
       }
     }
-  });
+  );
 
   function switchLeftPanel() {
 
@@ -207,10 +225,6 @@ function Map() {
     setdisplayRightSidePanel(!displayRightSidePanel)
   }
   
-  function measureTool(e: any) {
-    console.log('mediremos em breve')
-  }
-
   function streetView(e: any) {
     console.log('veremos em breve')
   }
@@ -302,12 +316,59 @@ function Map() {
           />
         </LeftSidePanel>
         <MiddlePanel>
-          
           <LeftSidePanelSwitcher onClick={switchLeftPanel}>
               {(displayLeftSidePanel)? (<FaCaretLeft/>) : (<FaCaretRight/> )}
           </LeftSidePanelSwitcher>
+          
           <ButtonsContainer>
-            <MapButton onClick={measureTool}><FaRulerCombined/></MapButton>
+            <MapButton 
+              onClick={() => setIsEnabledToolbox(!isEnabledToolbox)}
+            >
+              <FaToolbox/>
+            </MapButton>
+            {
+              (isEnabledToolbox) ? (
+                <>
+                  <MapButton>
+                    <MeasureButton
+                      name="distance"
+                      map={map}
+                      measureType="line"
+                      clickToDrawText='Clique para medir uma distância'
+                      continueLineMsg='Clique para medir uma distância'
+                      pressed={false}
+                      icon={
+                        <FaRulerCombined/>
+                      }
+                      pressedIcon={
+                        <FaRulerCombined color='green'/>
+                      }
+                      multipleDrawing
+                    >
+                    </MeasureButton>
+                  </MapButton>
+                  <MapButton>
+                    <MeasureButton
+                      name="area"
+                      map={map}
+                      measureType="polygon"
+                      icon={
+                        <FaDrawPolygon/>
+                      }
+                      pressedIcon={
+                        <FaDrawPolygon color='green'/>
+                      }
+                      pressed={false}
+                      clickToDrawText='Clique para medir uma área'
+                      continuePolygonMsg='Clique para medir uma área'
+                      multipleDrawing>
+                    </MeasureButton>
+                  </MapButton>
+                </>
+              ) : (
+                <></>
+              )
+            }
             <MapButton onClick={streetView}>
               <FaStreetView />
             </MapButton>
