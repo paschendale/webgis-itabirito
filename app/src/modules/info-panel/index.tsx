@@ -19,6 +19,8 @@ import { FaFilePdf,  FaMapMarkerAlt } from 'react-icons/fa';
 import { LatLng, Map, LatLngBoundsExpression } from 'leaflet';
 import proj4 from 'proj4';
 
+import OlMap from 'ol/Map';
+
 interface InfoPaneProps {
   features: any | undefined;
   isLoading: boolean;
@@ -34,37 +36,10 @@ interface FeatureContainerProps {
 function FeatureContainer({feature,index,map}: FeatureContainerProps) {
   const[open,setOpen] = useState(false)
 
-  function fitBounds(map: Map, bbox: [number, number, number, number]): any {
-
-    const [xmin, ymin, xmax, ymax] = bbox;
-
-    var bounds3857 = [
-      [xmin, ymin],
-      [xmax, ymax],
-    ];
-
-    // Define the projection of the source coordinates
-    const sourceProjection = '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs';
-
-    // Define the projection of the target coordinates (WGS84)
-    const targetProjection = '+proj=longlat +datum=WGS84 +no_defs';
-
-    // Define a Proj4js transformation function
-    const transform = proj4(sourceProjection, targetProjection).forward;
-
-    // Transform the bounds coordinates
-    const boundsWGS84 = bounds3857.map(point => {
-      const [lng, lat] = transform(point);
-      return new LatLng(lat, lng);
-    });
-
-    const boundsTuple: LatLngBoundsExpression = [
-      [boundsWGS84[0].lat, boundsWGS84[0].lng],
-      [boundsWGS84[1].lat, boundsWGS84[1].lng]
-    ];
+  function fitBounds(map: OlMap, bbox: [number, number, number, number]): any {
 
     if (map) {
-      map.flyToBounds(boundsTuple);
+      map.getView().fit(bbox, { padding: [50, 50, 50, 50], duration: 1000 })
     }
   }
 

@@ -140,7 +140,6 @@ function Map() {
     if (getFeatureInfoUrl) {
 
       var layers = map.getAllLayers()
-      console.log("🚀 ~ file: index.tsx:129 ~ useEffect ~ layers:", layers)
 
       getFeatureInfo(getFeatureInfoUrl)
     }
@@ -150,7 +149,7 @@ function Map() {
 
     setIsLoadingInfoPanel(true)  
     setdisplayLeftSidePanel(true)
-    
+
     try {
       
       var response = await api.get(url)
@@ -306,7 +305,7 @@ function Map() {
           <InfoPanel 
             features={features} 
             isLoading={isLoadingInfoPanel}
-            map={mapRef.current}
+            map={map}
           />
         </LeftSidePanel>
         <MiddlePanel>
