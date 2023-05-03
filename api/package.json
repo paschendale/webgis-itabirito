@@ -26,7 +26,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
-    "@types/node": "^18.15.10",
+    "@types/node": "^18.16.3",
     "@types/pg": "^8.6.6"
   }
 }
