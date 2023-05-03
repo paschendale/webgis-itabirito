@@ -1,11 +1,11 @@
 import './styles.css'
-import { ButtonsContainer, Container, LeftSidePanel, LeftSidePanelSwitcher, MapContainer, MiddlePanel, RightSidePanel, RightSidePanelSwitcher, Version } from './styles';
+import { ButtonsContainer, Container, CoordinatesContainer, Footer, LeftSidePanel, LeftSidePanelSwitcher, MapContainer, MiddlePanel, RightSidePanel, RightSidePanelSwitcher, VersionContainer } from './styles';
 import { useEffect, useRef, useState } from "react"
 import SearchBox from '../../modules/searchbox';
 import InfoPanel from '../../modules/info-panel';
 import { api } from '../../services/api';
 import { toastError } from '../../utils';
-import { FaCaretLeft, FaCaretRight, FaCaretUp, FaDrawPolygon, FaGithub, FaRulerCombined, FaStreetView, FaToolbox } from 'react-icons/fa';
+import { FaCaretLeft, FaCaretRight, FaCaretUp, FaCopy, FaDrawPolygon, FaGithub, FaRegCopy, FaRulerCombined, FaStreetView, FaToolbox } from 'react-icons/fa';
 import PanoramicViewer from '../../components/panoramic-viewer';
 import { useLocation } from 'react-router-dom';
 import pj from "./../../../package.json"
@@ -16,7 +16,7 @@ import OlMap from 'ol/Map';
 import OlView from 'ol/View';
 import TileLayer from 'ol/layer/Tile.js';
 import TileWMS from 'ol/source/TileWMS.js';
-import { fromLonLat } from 'ol/proj';
+import { fromLonLat, toLonLat } from 'ol/proj';
 import { Fill, Stroke, Style } from "ol/style";
 import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
@@ -59,6 +59,8 @@ function Map() {
 
   // Tools states & refs
   const[isEnabledToolbox,setIsEnabledToolbox] = useState(false)
+  const[coordinatesOnDisplay,setCoordinatesOnDisplay] = useState<number[]>()
+  const[coordinatesToClipboard,setCoordinatesToClipboard] = useState<number[]>()
 
   useEffect(() => {
     if(layers && layerOrder) {
@@ -149,6 +151,15 @@ function Map() {
       toast.info('A seleção de feições no mapa foi desabilitada, desative a caixa de ferramentas para ativá-la novamente')
     }
   },[isEnabledToolbox])
+
+  useEffect(() => {
+    if(coordinatesToClipboard) {
+      navigator.clipboard.writeText(
+        coordinatesToClipboard[1] + ` , ` + coordinatesToClipboard[0]
+      )
+      toast.info('Coordenadas copiadas para a área de transferência')
+    }
+  },[coordinatesToClipboard])
   
   async function getFeatureInfo(url: string) {
 
@@ -181,7 +192,7 @@ function Map() {
     }
   }
 
-  map.on('singleclick', function (e) {
+  map.on('singleclick', (e) => {
 
       const viewResolution = (map.getView().getResolution());
 
@@ -214,6 +225,14 @@ function Map() {
       }
     }
   );
+
+  map.on('pointermove', (e) => {
+
+    if(e.coordinate) {
+      var transformedCoordinates = toLonLat(e.coordinate)
+      setCoordinatesOnDisplay(transformedCoordinates)
+    }
+  })
 
   function switchLeftPanel() {
 
@@ -384,11 +403,6 @@ function Map() {
               map={map}
             />
           </MapContainer>
-          <Version>
-            <div style={{padding: 4}}>
-              webgis-itabirito:v.{pj.version} <a style={{color: 'inherit'}} href='https://github.com/paschendale/webgis-itabirito' target={'_blank'} rel="noreferrer"><span style={{color: 'inherit'}}><FaGithub/></span></a>
-            </div>
-          </Version>
           <RightSidePanelSwitcher onClick={switchRightPanel}>
               {(displayRightSidePanel)? (<FaCaretRight/> ) : (<FaCaretLeft/>)}
           </RightSidePanelSwitcher>
@@ -397,6 +411,22 @@ function Map() {
             <PanoramicViewer></PanoramicViewer>
         </RightSidePanel>
       </Container>
+      <Footer>
+        <VersionContainer>
+          webgis-itabirito:v.{pj.version} <a style={{color: 'inherit'}} href='https://github.com/paschendale/webgis-itabirito' target={'_blank'} rel="noreferrer"><span style={{color: 'inherit'}}><FaGithub/></span></a>
+        </VersionContainer>
+        {
+          coordinatesOnDisplay && 
+          <CoordinatesContainer>
+            &nbsp;
+            Latitude: { Math.round(coordinatesOnDisplay[1]*10000)/10000 }
+            &nbsp;
+            Longitude: { Math.round(coordinatesOnDisplay[0]*10000)/10000 }
+            &nbsp;&nbsp;&nbsp;
+            <FaRegCopy onClick={() => setCoordinatesToClipboard(coordinatesOnDisplay)} style={{cursor: 'pointer'}}/>
+          </CoordinatesContainer>
+        }
+      </Footer>
       <ToastContainer />
     </>
   );
