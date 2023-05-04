@@ -6,6 +6,7 @@ import InfoPanel from '../../modules/info-panel';
 import { api } from '../../services/api';
 import { toastError } from '../../utils';
 import { FaCaretLeft, FaCaretRight, FaCaretUp, FaCopy, FaDrawPolygon, FaGithub, FaRegCopy, FaRulerCombined, FaStreetView, FaToolbox } from 'react-icons/fa';
+import { HiOutlineSwitchVertical } from 'react-icons/hi';
 import PanoramicViewer from '../../components/panoramic-viewer';
 import { useLocation } from 'react-router-dom';
 import pj from "./../../../package.json"
@@ -40,6 +41,64 @@ const map = new OlMap({
   })
 });
 
+function Coordinates({coordinatesOnDisplay, coordinatesDisplayMode, coordinatesOnMouse}: any) {
+  
+  const[coordinatesToClipboard,setCoordinatesToClipboard] = useState<number[]>()
+  
+  useEffect(() => {
+    if(coordinatesToClipboard) {
+      navigator.clipboard.writeText(
+        coordinatesToClipboard.join(` , `)
+      )
+      toast.info('Coordenadas copiadas para a área de transferência')
+    }
+  },[coordinatesToClipboard])
+
+  function formatCoordinate(index: number) {
+
+    if (coordinatesDisplayMode === 'mouse') {
+
+      if ( index < coordinatesOnMouse.length ) {
+
+      return (Math.round(coordinatesOnMouse[index]*10000)/10000)
+      }
+    } else {
+
+      if (index < coordinatesOnDisplay.length) {
+
+        return (Math.round(coordinatesOnDisplay[index]*10000)/10000)
+      }
+    } 
+  }
+
+  return (
+    coordinatesOnDisplay && <>
+        {(coordinatesDisplayMode !== 'bbox') ? (
+          <>
+            Coordenadas do {coordinatesDisplayMode} -  
+            Lat: { formatCoordinate(1) }
+            &nbsp;
+            Lon: { formatCoordinate(0) }
+            &nbsp;&nbsp;&nbsp;
+          </>
+        ) : (
+          <>
+            Coordenadas do retângulo do mapa -  
+            NE Lat: { formatCoordinate(1) }
+            &nbsp;
+            NE Lon:: { formatCoordinate(0) }
+            &nbsp;
+            SE Lat: { formatCoordinate(3) }
+            &nbsp;
+            NE Lon:: { formatCoordinate(2) }
+            &nbsp;
+          </>
+        )}
+        <FaRegCopy onClick={() => setCoordinatesToClipboard(coordinatesOnDisplay)} style={{cursor: 'pointer'}}/>
+    </>
+    )
+}
+
 function Map() {
 
   const location = useLocation()
@@ -59,8 +118,9 @@ function Map() {
 
   // Tools states & refs
   const[isEnabledToolbox,setIsEnabledToolbox] = useState(false)
-  const[coordinatesOnDisplay,setCoordinatesOnDisplay] = useState<number[]>()
-  const[coordinatesToClipboard,setCoordinatesToClipboard] = useState<number[]>()
+  const[coordinatesOnDisplay,setCoordinatesOnDisplay] = useState<number[]>([0,0])
+  const[coordinatesOnMouse,setCoordinatesOnMouse] = useState<number[]>([0,0])
+  const[coordinatesDisplayMode,setCoordinatesDisplayMode] = useState('centro')
 
   useEffect(() => {
     if(layers && layerOrder) {
@@ -167,13 +227,29 @@ function Map() {
   },[isEnabledToolbox])
 
   useEffect(() => {
-    if(coordinatesToClipboard) {
-      navigator.clipboard.writeText(
-        coordinatesToClipboard[1] + ` , ` + coordinatesToClipboard[0]
-      )
-      toast.info('Coordenadas copiadas para a área de transferência')
+
+    var d = coordinatesDisplayMode
+    if(d === 'centro') {
+
+      var transformedCoordinates = toLonLat(map.getView().getCenter()!)
+      setCoordinatesOnDisplay(transformedCoordinates)
+    } else if(d === 'mouse') {
+      
+      var transformedCoordinates = toLonLat(map.getView().getCenter()!)
+      setCoordinatesOnMouse(transformedCoordinates)
+    } else {
+
+      var extent = map.getView().calculateExtent()
+      var transformedCoordinatesNW = toLonLat([extent[0],extent[1]])
+      var transformedCoordinatesSE = toLonLat([extent[2],extent[3]])
+      setCoordinatesOnDisplay([
+        transformedCoordinatesNW[0],
+        transformedCoordinatesNW[1],
+        transformedCoordinatesSE[0],
+        transformedCoordinatesSE[1]
+      ])
     }
-  },[coordinatesToClipboard])
+  },[coordinatesDisplayMode])
   
   async function getFeatureInfo(url: string) {
 
@@ -240,11 +316,31 @@ function Map() {
     }
   );
 
+  map.on('moveend', (e) => {
+
+    if(coordinatesDisplayMode === 'centro') {
+
+      var transformedCoordinates = toLonLat(map.getView().getCenter()!)
+      setCoordinatesOnDisplay(transformedCoordinates)
+    } else if(coordinatesDisplayMode === 'bbox') {
+
+      var extent = map.getView().calculateExtent()
+      var transformedCoordinatesNW = toLonLat([extent[0],extent[1]])
+      var transformedCoordinatesSE = toLonLat([extent[2],extent[3]])
+      setCoordinatesOnDisplay([
+        transformedCoordinatesNW[0],
+        transformedCoordinatesNW[1],
+        transformedCoordinatesSE[0],
+        transformedCoordinatesSE[1]
+      ])
+    }
+  })
+
   map.on('pointermove', (e) => {
 
-    if(e.coordinate) {
+    if(e.coordinate && coordinatesDisplayMode === 'mouse') {
       var transformedCoordinates = toLonLat(e.coordinate)
-      setCoordinatesOnDisplay(transformedCoordinates)
+      setCoordinatesOnMouse(transformedCoordinates)
     }
   })
 
@@ -358,6 +454,21 @@ function Map() {
     return vectorLayer
   }
 
+  function switchCoordinatesDisplayMode() {
+
+    var d = coordinatesDisplayMode
+    if(d === 'centro') {
+
+      setCoordinatesDisplayMode('mouse')
+    } else if(d === 'mouse') {
+
+      setCoordinatesDisplayMode('bbox')
+    } else {
+
+      setCoordinatesDisplayMode('centro')
+    }
+  }
+
   return ( 
     <>
       <Container>
@@ -372,7 +483,6 @@ function Map() {
           <LeftSidePanelSwitcher onClick={switchLeftPanel}>
               {(displayLeftSidePanel)? (<FaCaretLeft/>) : (<FaCaretRight/> )}
           </LeftSidePanelSwitcher>
-          
           <ButtonsContainer>
             <MapButton 
               onClick={() => setIsEnabledToolbox(!isEnabledToolbox)}
@@ -439,19 +549,13 @@ function Map() {
       </Container>
       <Footer>
         <VersionContainer>
-          webgis-itabirito:v.{pj.version} <a style={{color: 'inherit'}} href='https://github.com/paschendale/webgis-itabirito' target={'_blank'} rel="noreferrer"><span style={{color: 'inherit'}}><FaGithub/></span></a>
+          webgis-itabirito:v.{pj.version} &nbsp; <a style={{color: 'inherit'}} href='https://github.com/paschendale/webgis-itabirito' target={'_blank'} rel="noreferrer"><span style={{color: 'inherit'}}><FaGithub/></span></a>
         </VersionContainer>
-        {
-          coordinatesOnDisplay && 
-          <CoordinatesContainer>
-            &nbsp;
-            Latitude: { Math.round(coordinatesOnDisplay[1]*10000)/10000 }
-            &nbsp;
-            Longitude: { Math.round(coordinatesOnDisplay[0]*10000)/10000 }
-            &nbsp;&nbsp;&nbsp;
-            <FaRegCopy onClick={() => setCoordinatesToClipboard(coordinatesOnDisplay)} style={{cursor: 'pointer'}}/>
-          </CoordinatesContainer>
-        }
+        <CoordinatesContainer>
+          <HiOutlineSwitchVertical style={{cursor: 'pointer'}} onClick={() => switchCoordinatesDisplayMode()}/>
+          &nbsp;
+          <Coordinates coordinatesOnDisplay={coordinatesOnDisplay!} coordinatesOnMouse={coordinatesOnMouse!} coordinatesDisplayMode={coordinatesDisplayMode}/>
+        </CoordinatesContainer>
       </Footer>
       <ToastContainer />
     </>

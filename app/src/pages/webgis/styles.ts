@@ -140,11 +140,19 @@ export const Footer = styled.div`
 `
 
 export const VersionContainer = styled.div`
+  display: flex;
+  align-items: center;
   margin-left: 25px;
 `
 
 export const CoordinatesContainer = styled.div`
+  display: flex;
+  align-items: center;
   margin-right: 25px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `
 
 export const MapContainer = styled.div `
