@@ -208,3 +208,12 @@ export const MapContainer = styled.div `
     display: none;
   }
 `
+
+type ToolboxProps = {
+  display: boolean;
+}
+
+export const Toolbox = styled.div<ToolboxProps>`
+  display: ${(props: ToolboxProps) => ((props.display)? 'auto' : 'none')};
+  transition: all 0.2s;
+`

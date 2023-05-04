@@ -1,5 +1,5 @@
 import './styles.css'
-import { ButtonsContainer, Container, CoordinatesContainer, Footer, LeftSidePanel, LeftSidePanelSwitcher, MapContainer, MiddlePanel, RightSidePanel, RightSidePanelSwitcher, VersionContainer } from './styles';
+import { ButtonsContainer, Container, CoordinatesContainer, Footer, LeftSidePanel, LeftSidePanelSwitcher, MapContainer, MiddlePanel, RightSidePanel, RightSidePanelSwitcher, Toolbox, VersionContainer } from './styles';
 import { useEffect, useRef, useState } from "react"
 import SearchBox from '../../modules/searchbox';
 import InfoPanel from '../../modules/info-panel';
@@ -379,49 +379,41 @@ function Map() {
             >
               <FaToolbox/>
             </MapButton>
-            {
-              (isEnabledToolbox) ? (
-                <>
-                  <MapButton>
-                    <MeasureButton
-                      name="distance"
-                      map={map}
-                      measureType="line"
-                      clickToDrawText='Clique para medir uma distância'
-                      continueLineMsg='Clique para medir uma distância'
-                      pressed={false}
-                      icon={
-                        <FaRulerCombined/>
-                      }
-                      pressedIcon={
-                        <FaRulerCombined color='green'/>
-                      }
-                      multipleDrawing
-                    >
-                    </MeasureButton>
-                  </MapButton>
-                  <MapButton>
-                    <MeasureButton
-                      name="area"
-                      map={map}
-                      measureType="polygon"
-                      icon={
-                        <FaDrawPolygon/>
-                      }
-                      pressedIcon={
-                        <FaDrawPolygon color='green'/>
-                      }
-                      pressed={false}
-                      clickToDrawText='Clique para medir uma área'
-                      continuePolygonMsg='Clique para medir uma área'
-                      multipleDrawing>
-                    </MeasureButton>
-                  </MapButton>
-                </>
-              ) : (
-                <></>
-              )
-            }
+            <Toolbox display={isEnabledToolbox}>
+              <MapButton>
+                <MeasureButton
+                  name="distance"
+                  map={map}
+                  measureType="line"
+                  clickToDrawText='Clique para medir uma distância'
+                  continueLineMsg='Clique para medir uma distância'
+                  icon={
+                    <FaRulerCombined/>
+                  }
+                  pressedIcon={
+                    <FaRulerCombined color='green'/>
+                  }
+                  multipleDrawing
+                >
+                </MeasureButton>
+              </MapButton>
+              <MapButton>
+                <MeasureButton
+                  name="area"
+                  map={map}
+                  measureType="polygon"
+                  icon={
+                    <FaDrawPolygon/>
+                  }
+                  pressedIcon={
+                    <FaDrawPolygon color='green'/>
+                  }
+                  clickToDrawText='Clique para medir uma área'
+                  continuePolygonMsg='Clique para medir uma área'
+                  multipleDrawing>
+                </MeasureButton>
+              </MapButton>
+            </Toolbox>
             <MapButton onClick={streetView}>
               <FaStreetView />
             </MapButton>
