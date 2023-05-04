@@ -86,10 +86,24 @@ function Map() {
       map.addLayer(selectedFeatures)    
 
       try {
+
+        var extent = selectedFeatures.getSource()?.getExtent()
         
-        if (selectedFeatures.getSource()?.getExtent() ) {
-  
-           map.getView().fit(selectedFeatures.getSource()?.getExtent()!, { padding: [50, 50, 50, 50], duration: 1000 });
+        if (extent) {
+
+          if (extent[0] === extent[2]) {
+            
+            map.getView().animate(
+              {
+                center: [extent[0],extent[1]],
+                zoom: 19,
+                duration: 1000
+              }
+            );
+          } else {
+
+            map.getView().fit(extent, { padding: [50, 50, 50, 50], duration: 1000 });
+          }
         }
       } catch (error) {
         

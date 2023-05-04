@@ -36,7 +36,20 @@ function FeatureContainer({feature,index,map}: FeatureContainerProps) {
   function fitBounds(map: OlMap, bbox: [number, number, number, number]): any {
 
     if (map) {
-      map.getView().fit(bbox, { padding: [50, 50, 50, 50], duration: 1000 })
+
+      if (bbox[0] === bbox[2]) {
+            
+        map.getView().animate(
+          {
+            center: [bbox[0],bbox[1]],
+            zoom: 19,
+            duration: 1000
+          }
+        );
+      } else {
+
+        map.getView().fit(bbox, { padding: [50, 50, 50, 50], duration: 1000 })
+      }
     }
   }
 
