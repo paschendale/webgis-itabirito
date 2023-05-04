@@ -17,7 +17,7 @@ import OlView from 'ol/View';
 import TileLayer from 'ol/layer/Tile.js';
 import TileWMS from 'ol/source/TileWMS.js';
 import { fromLonLat, toLonLat } from 'ol/proj';
-import { Fill, Stroke, Style } from "ol/style";
+import { Circle, Fill, Stroke, Style } from "ol/style";
 import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
 import GeoJSON from "ol/format/GeoJSON";
@@ -314,16 +314,36 @@ function Map() {
 
     const geojson: Array<Feature> = new GeoJSON().readFeatures(makeGeojson(features));
   
-    var selectedStyle = new Style({
-      stroke: new Stroke({
-        color: "rgb(255, 208, 0)",
-        width: 3,
-      }),
-      fill: new Fill({
-        color: "rgba(255, 208, 0, 0.35)",
-      }),
-    })
-  
+    function selectedStyle(feature: any) {
+
+      if(feature.getGeometry().getType() === 'Point') {
+
+        return new Style({
+          image: new Circle({
+            radius: 7,
+            fill: new Fill({
+              color: "rgba(255, 208, 0, 0.35)",
+            }),
+            stroke: new Stroke({
+              color: "rgb(255, 208, 0)",
+              width: 3,
+            }),
+          })
+        })
+      } else {
+
+        return new Style({
+          stroke: new Stroke({
+            color: "rgb(255, 208, 0)",
+            width: 3,
+          }),
+          fill: new Fill({
+            color: "rgba(255, 208, 0, 0.35)",
+          }),
+        })
+      }
+    }
+
     const vectorLayer = new VectorLayer({
       source: new VectorSource({
         features: geojson
