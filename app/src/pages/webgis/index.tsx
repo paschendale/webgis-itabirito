@@ -109,6 +109,7 @@ function Map() {
   const[layerOrder,setLayerOrder] = useState<string>('')
   const[layers,setLayers] = useState<Array<Layer>>()
   const[getFeatureInfoUrl,setGetFeatureInfoUrl] = useState<string>()
+  const[streetViewCoordinates,setStreetViewCoordinates] = useState<Array<number>>([])
 
   // Info Panel states
   const[displayLeftSidePanel,setdisplayLeftSidePanel] = useState(false)
@@ -545,6 +546,7 @@ function Map() {
         </MiddlePanel>
         <RightSidePanel display={displayRightSidePanel}>
             <PanoramicViewer></PanoramicViewer>
+            <PanoramicViewer coords={streetViewCoordinates} map={map}></PanoramicViewer>
         </RightSidePanel>
       </Container>
       <Footer>
