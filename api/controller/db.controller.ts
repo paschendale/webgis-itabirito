@@ -1,6 +1,6 @@
 import { consoleLog, parseXML } from "./../utils"
 import { Request, Response } from "express";
-import { searchService } from "../service/db.service";
+import { searchService, getNearestPanoramaService } from "../service/db.service";
 import { authenticateService } from "../service/auth.service";
 import { getCatalog } from "../service/qgis.service";
 
@@ -64,3 +64,22 @@ export async function searchController(req: Request, res: Response) {
     return res.status(500).send(error)
   }
 }
+
+export async function getNearestPanoramaController(req: Request, res: Response) {
+  const{ x, y } = req.params
+
+  try {
+
+    const panoramas = await getNearestPanoramaService(parseFloat(x), parseFloat(y), 3857, 10) 
+
+    consoleLog(`db: (200) Found ${panoramas.length} results`)
+    return res.status(200).send(panoramas)
+  } catch (error) {
+    
+    errorTreatment(error)
+
+    consoleLog(`db: (500) An error ocurred: ${error}`)
+    return res.status(500).send(error)
+  }
+}
+

@@ -114,3 +114,40 @@ export async function verifyTable(tableName: string, tableSchema?: string) {
     throw new Error(`A tabela ${tableSchema}.${tableName} não existe no banco de dados`)
   }
 }
+
+export async function getNearestPanoramaService(x: number, y: number, srid?:number, limit?: number) {
+
+  if (!srid) {
+    srid = 3857
+  }
+
+  if (!limit) {
+    limit = 1
+  }
+  
+  consoleLog(`db: Querying dados.pto_panoramas_p on coordinates X: ${x}; Y: ${y}`)
+  
+  let query =  `SELECT 
+    link_foto,  
+    radians(degrees(ST_Azimuth( (ST_Dump(ST_Transform(a.geom,31983))).geom,  (ST_Dump(ST_Transform(b.geom,31983))).geom))-azimuth) azimuth_to_click,
+    ST_Distance(ST_Transform(a.geom,31983), ST_Transform(b.geom,31983)) AS distance_to_click,
+    a.*,
+    ST_X(ST_Transform(a.geom,3857)) AS x,
+    ST_Y(ST_Transform(a.geom,3857)) AS y
+  FROM dados.pto_panorama_p a, (
+    SELECT ST_SetSRID(ST_MakePoint(${x},${y}),${srid}) AS geom
+  ) b
+  ORDER BY ST_Distance(ST_Transform(a.geom,31983), ST_Transform(b.geom,31983))
+  LIMIT ${limit};`
+
+  let response = await db.query(query)
+
+  if (response.rows.length > 0) {
+
+    return response.rows
+  } else {
+
+    throw new Error(`Houve um erro ao obter os panoramas próximos da coordenada especificada`)
+  }
+
+}
