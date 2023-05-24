@@ -252,6 +252,19 @@ function Map() {
     }
   },[coordinatesDisplayMode])
   
+  map.on('singleclick', (e) => {
+
+    if (e.coordinate !== streetViewCoordinates) {
+
+      setStreetViewCoordinates(e.coordinate)
+    }
+  })
+
+  useEffect(() => {
+
+    setdisplayRightSidePanel(true)
+  },[streetViewCoordinates])
+
   async function getFeatureInfo(url: string) {
 
     setIsLoadingInfoPanel(true)  
@@ -283,39 +296,39 @@ function Map() {
     }
   }
 
-  map.on('singleclick', (e) => {
+  // map.on('singleclick', (e) => {
 
-      const viewResolution = (map.getView().getResolution());
+  //     const viewResolution = (map.getView().getResolution());
 
-      var mapLayers = map
-        .getAllLayers()
-        .filter(layer => layer.get('name') !== 'selectedFeatures' && layer.get('name') !== 'react-geo_measure')
+  //     var mapLayers = map
+  //       .getAllLayers()
+  //       .filter(layer => layer.get('name') !== 'selectedFeatures' && layer.get('name') !== 'react-geo_measure')
   
-      if (mapLayers[0]) {
+  //     if (mapLayers[0]) {
   
-        var source = mapLayers[0].getSource() as TileWMS
+  //       var source = mapLayers[0].getSource() as TileWMS
   
-        var lyrs = layers?.filter(e => e['@_queryable'] === '1').map(e => e.Name)
+  //       var lyrs = layers?.filter(e => e['@_queryable'] === '1').map(e => e.Name)
   
-        var url = source.getFeatureInfoUrl(
-          e.coordinate,
-          viewResolution!,
-          'EPSG:3857',
-          {
-            info_format: 'application/json',
-            with_geometry: 'true',
-            feature_count: '50000',
-            layers: lyrs?.join(','),
-            query_layers: lyrs?.join(',')
-          }
-        )
+  //       var url = source.getFeatureInfoUrl(
+  //         e.coordinate,
+  //         viewResolution!,
+  //         'EPSG:3857',
+  //         {
+  //           info_format: 'application/json',
+  //           with_geometry: 'true',
+  //           feature_count: '50000',
+  //           layers: lyrs?.join(','),
+  //           query_layers: lyrs?.join(',')
+  //         }
+  //       )
   
-        if (url !== getFeatureInfoUrl) {
-          setGetFeatureInfoUrl(url?.replace('api/map','map/info')!)
-        }
-      }
-    }
-  );
+  //       if (url !== getFeatureInfoUrl) {
+  //         setGetFeatureInfoUrl(url?.replace('api/map','map/info')!)
+  //       }
+  //     }
+  //   }
+  // );
 
   map.on('moveend', (e) => {
 
@@ -545,7 +558,6 @@ function Map() {
           </RightSidePanelSwitcher>
         </MiddlePanel>
         <RightSidePanel display={displayRightSidePanel}>
-            <PanoramicViewer></PanoramicViewer>
             <PanoramicViewer coords={streetViewCoordinates} map={map}></PanoramicViewer>
         </RightSidePanel>
       </Container>

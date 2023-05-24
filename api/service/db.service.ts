@@ -134,7 +134,7 @@ export async function getNearestPanoramaService(x: number, y: number, srid?:numb
     a.*,
     ST_X(ST_Transform(a.geom,3857)) AS x,
     ST_Y(ST_Transform(a.geom,3857)) AS y
-  FROM dados.pto_panorama_p a, (
+  FROM dados.pto_panoramas_p a, (
     SELECT ST_SetSRID(ST_MakePoint(${x},${y}),${srid}) AS geom
   ) b
   ORDER BY ST_Distance(ST_Transform(a.geom,31983), ST_Transform(b.geom,31983))
