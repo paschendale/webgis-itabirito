@@ -163,6 +163,7 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
 
             setAzimuthClick( calculateAzimuth(coords, [panorama[0].x, panorama[0].y]))
             setAzimuthDefault(keepItLessThan360(360 - Number(panorama[0].azimuth) + azimuthClick));
+            setAzimuth( azimuthDefault )
 
             if (panorama[0].link_foto !== panoramaUrl) {
 
@@ -174,22 +175,36 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
     },[panorama])
 
     function calculateTriangleCoords(anchor: Array<number>, base: number, height: number, rotation: number) {
-        const rotationRad = (rotation * Math.PI) / 180; // Convert rotation to radians
+        const phi = (rotation * Math.PI) / 180; // Convert rotation to radians
     
-        const centerX = anchor[0];
-        const centerY = anchor[1];
+        const Xa = anchor[0];
+        const Ya = anchor[1];
+
+        const t = Math.atan(base / (2 * height) )
+
+        const l = base / (2 * Math.sin(t))
+
+        const X1 = Xa + l * Math.sin(phi - t)
+        const Y1 = Ya + l * Math.cos(phi - t)
+        const X2 = Xa + l * Math.sin(phi + t)
+        const Y2 = Ya + l * Math.cos(phi + t)
+
+        console.log(`
+            Rotation: ${rotation}
+            Base: ${base}
+            Height: ${height}
+            Rotation (phi): ${phi}
+            t: ${t}
+            l: ${l}
+            Xa: ${Xa}
+            Ya: ${Ya}
+            X1: ${X1}
+            Y1: ${Y1}
+            X2: ${X2}
+            Y2: ${Y2}
+        `)
     
-        const halfBase = base / 2;
-        const halfHeight = height / 2;
-    
-        const angleRad = Math.atan(halfBase / halfHeight);
-    
-        const x1 = centerX + Math.cos(rotationRad - angleRad) * halfHeight;
-        const y1 = centerY + Math.sin(rotationRad - angleRad) * halfHeight;
-        const x2 = centerX + Math.cos(rotationRad + angleRad) * halfHeight;
-        const y2 = centerY + Math.sin(rotationRad + angleRad) * halfHeight;
-    
-        return [[x1, y1], [centerX, centerY], [x2, y2], [x1, y1]];
+        return [[Xa, Ya], [X1, Y1], [X2, Y2], [Xa, Ya]];
       };
 
     useEffect(() => {
@@ -206,7 +221,7 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
         
             const triangleLayer = new VectorLayer({
                 source: new VectorSource({
-                    features: [new Feature(new Polygon([calculateTriangleCoords([panorama[0].x,panorama[0].y], (20/(1-Math.abs(pitch)))*(120-zoom)/120, 50, azimuthDefault - azimuth + azimuthClick )]))]
+                    features: [new Feature(new Polygon([calculateTriangleCoords([panorama[0].x,panorama[0].y], (20/(1-Math.abs(pitch)))*(120-zoom)/120, 30, azimuthClick + (azimuth - azimuthDefault) )]))]
                 }),
                 style: triangleStyle,
                 properties: {
@@ -225,11 +240,11 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
             }
         
             map.addLayer(triangleLayer);
-            // console.log(`
-            //     zoom: ${zoom} & pitch: ${pitch}
-            //     Current azimuth: ${azimuth}
-            //     Azimuth Default: ${azimuthDefault}
-            //     AzimuthClick: ${azimuthClick}`)
+            console.log(`
+            zoom: ${zoom} & pitch: ${pitch}
+            Current azimuth: ${azimuth}
+            Azimuth Default: ${azimuthDefault}
+            AzimuthClick: ${azimuthClick}`)
         }
 
     },[azimuthDefault,zoom,pitch,panorama])
