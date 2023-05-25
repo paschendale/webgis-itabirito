@@ -70,10 +70,16 @@ export async function getNearestPanoramaController(req: Request, res: Response) 
 
   try {
 
-    const panoramas = await getNearestPanoramaService(parseFloat(x), parseFloat(y), 3857, 10) 
+    const panorama = await getNearestPanoramaService(parseFloat(x), parseFloat(y), 3857) 
 
-    consoleLog(`db: (200) Found ${panoramas.length} results`)
-    return res.status(200).send(panoramas)
+    if (panorama) {
+
+      consoleLog(`db: (200) Found panorama on ${x}:${y}`)
+      return res.status(200).send(panorama)
+    } else {
+    
+      throw new Error(`No panorama found near ${x}:${y}`)
+    }
   } catch (error) {
     
     errorTreatment(error)

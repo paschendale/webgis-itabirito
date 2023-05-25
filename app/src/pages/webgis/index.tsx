@@ -109,7 +109,7 @@ function Map() {
   const[layerOrder,setLayerOrder] = useState<string>('')
   const[layers,setLayers] = useState<Array<Layer>>()
   const[getFeatureInfoUrl,setGetFeatureInfoUrl] = useState<string>()
-  const[streetViewCoordinates,setStreetViewCoordinates] = useState<Array<number>>([])
+  const[streetViewCoordinates,setStreetViewCoordinates] = useState<Array<number>>([0,0])
 
   // Info Panel states
   const[displayLeftSidePanel,setdisplayLeftSidePanel] = useState(false)

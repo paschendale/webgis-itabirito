@@ -115,14 +115,10 @@ export async function verifyTable(tableName: string, tableSchema?: string) {
   }
 }
 
-export async function getNearestPanoramaService(x: number, y: number, srid?:number, limit?: number) {
+export async function getNearestPanoramaService(x: number, y: number, srid?:number) {
 
   if (!srid) {
     srid = 3857
-  }
-
-  if (!limit) {
-    limit = 1
   }
   
   consoleLog(`db: Querying dados.pto_panoramas_p on coordinates X: ${x}; Y: ${y}`)
@@ -138,13 +134,13 @@ export async function getNearestPanoramaService(x: number, y: number, srid?:numb
     SELECT ST_SetSRID(ST_MakePoint(${x},${y}),${srid}) AS geom
   ) b
   ORDER BY ST_Distance(ST_Transform(a.geom,31983), ST_Transform(b.geom,31983))
-  LIMIT ${limit};`
+  LIMIT 1;`
 
   let response = await db.query(query)
 
   if (response.rows.length > 0) {
 
-    return response.rows
+    return response.rows[0]
   } else {
 
     throw new Error(`Houve um erro ao obter os panoramas próximos da coordenada especificada`)

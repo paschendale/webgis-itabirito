@@ -1,15 +1,15 @@
 import { ReactPhotoSphereViewer } from 'react-photo-sphere-viewer';
 import { api } from '../../services/api';
-import { createRef, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LoadingPlaceHolder } from './styles';
 import OlMap from 'ol/Map';
 import Feature from 'ol/Feature';
-import { Circle, Fill, Stroke, Style, RegularShape } from "ol/style.js";
-import View from 'ol/View';
+import { Circle, Fill, Stroke, Style } from "ol/style.js";
 import Point from 'ol/geom/Point';
 import { Polygon } from 'ol/geom';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
+import { useQuery } from "@tanstack/react-query";
 
 function keepItLessThan360(angle: number): number {
     if (angle < 0) {
@@ -23,63 +23,59 @@ function keepItLessThan360(angle: number): number {
     }
   }
 
-function calculateAzimuth(
-    origin: Array<number>,
-    destination: Array<number>,
-): number {
-    const deltaX = origin[0] - destination[0];
-    const deltaY = origin[1] - destination[1];
-
-    const rumo = Math.abs((Math.atan(deltaX / deltaY) * 180) / Math.PI);
-
-    if (deltaX > 0 && deltaY > 0) {
-        return keepItLessThan360(rumo);
-    } else if (deltaX > 0 && deltaY < 0) {
-        return keepItLessThan360(180 - rumo);
-    } else if (deltaX < 0 && deltaY < 0) {
-        return keepItLessThan360(rumo + 180);
-    } else if (deltaX < 0 && deltaY > 0) {
-        return keepItLessThan360(2 * 180 - rumo);
-    } else {
-        return 0;
-    }
-}
-
 type PanoramicViewerProps = {
     coords: Array<number>,
     map: OlMap
 }
 
 export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
-    const[panorama,setPanorama] = useState<Array<any>>([])
-    const[panoramaUrl,setPanoramaUrl] = useState('')
-    const[azimuth,setAzimuth] = useState(0)
-    const[azimuthDefault,setAzimuthDefault] = useState(0)
-    const[azimuthClick,setAzimuthClick] = useState(0)
-    const[pitch,setPitch] = useState(0)
-    const[zoom,setZoom] = useState(0)
-    const[markerFeature, setMarkerFeature] = useState<Feature>()
-    const[isLoading,setIsLoading] = useState(true)
+    const[panorama,setPanorama] = useState<any>()
+    const[azimuth,setAzimuth] = useState<number>()
+    const[azimuthDefault,setAzimuthDefault] = useState<number>()
+    const[azimuthClick,setAzimuthClick] = useState<number>()
+    const[pitch,setPitch] = useState<number>(0)
+    const[zoom,setZoom] = useState<number>(0)
 
-    const photoSphereRef = createRef<any>();
-    
-    function getLayerById(id: string): any {
-
-        const layers = map.getLayers().getArray();
-        const foundLayer = layers.find(layer => layer.get('id') === id);
-
-        return foundLayer
-    }
+    const { data: panoramaData, isLoading, isSuccess } = useQuery({
+        queryKey: [`/360/${coords[0]}/${coords[1]}`],
+        queryFn: getPanorama,
+        refetchOnWindowFocus: false,
+        refetchOnMount: true
+    });
 
     async function getPanorama() {
 
-        setIsLoading(true)
+        console.log(coords)
 
-        let panoramas = await api.get(`/360/${coords[0]}/${coords[1]}`)
-        
-        return panoramas
+        clearPanoramaLayers()
+
+        if(coords[0] !== 0 && coords[1] !== 0) {
+
+            try {
+                
+                let panoramas = await api.get(`/360/${coords[0]}/${coords[1]}`)
+                
+                return panoramas.data
+            } catch (error) {
+                
+                throw new Error(JSON.stringify(error))
+            }
+        } else {
+            return {}
+        }
     }
 
+    function clearPanoramaLayers() {
+
+        var mapLayers = map
+        .getAllLayers()
+        .filter(layer => layer.get('name') === 'markerLayer' ||  layer.get('name') === 'triangleLayer')
+    
+        if(mapLayers.length !== 0) {
+            
+            mapLayers.forEach(layer => map.removeLayer(layer))
+        }
+    }
     
     function buildMarkerLayer(coords: Array<number>, type?: string) {
 
@@ -126,56 +122,43 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
     }
     
     useEffect(() => {
-        
-        if(coords[0] && coords[1]) {
-            
-            setAzimuth(0)
 
-            var mapLayers = map
-                .getAllLayers()
-                .filter(layer => layer.get('name') === 'markerLayer' ||  layer.get('name') === 'triangleLayer')
-            
-            if(mapLayers.length !== 0) {
-                
-                mapLayers.forEach(layer => map.removeLayer(layer))
-            }
+        console.log(panoramaData)
+        
+        if(panoramaData && coords[0] !== 0 && coords[1] !== 0 && isSuccess) {
     
-            getPanorama()
-            .then((data: any) => {
-                setPanorama(data.data)
-                setIsLoading(false)
-            })
+            setAzimuthClick( 
+                keepItLessThan360(panoramaData.azimuth_to_click * 180 / Math.PI) 
+                )
+            setAzimuthDefault( 
+                keepItLessThan360(
+                    360 
+                    - Number(panoramaData.azimuth) 
+                    + keepItLessThan360(  Number(panoramaData.azimuth_to_click * 180 / Math.PI)) 
+                )
+            );
+            setAzimuth( 
+                keepItLessThan360(
+                    360 
+                    - Number(panoramaData.azimuth) 
+                    + keepItLessThan360(  Number(panoramaData.azimuth_to_click * 180 / Math.PI)) 
+                )
+            )
+            
+            setPanorama(panoramaData)
+            console.log(`O panorama está a ${panoramaData.distance_to_click} metros do ponto clicado`, panoramaData)
+            map.addLayer(buildMarkerLayer([panoramaData.x,panoramaData.y],'pano'))
 
             map.addLayer(buildMarkerLayer(coords))
         }
-    },[coords])
-
-    // useEffect(() => {
-    //     if (markerFeature) {
-    //       getLayerById('markerLayer')?.getSource().clear();
-    //       getLayerById('markerLayer')?.addFeature(markerFeature);
-    //     }
-    //   }, [markerFeature]);
-
-    useEffect(() => {
-
-        if (panorama[0]) {
-
-            setAzimuthClick( calculateAzimuth(coords, [panorama[0].x, panorama[0].y]))
-            setAzimuthDefault(keepItLessThan360(360 - Number(panorama[0].azimuth) + azimuthClick));
-            setAzimuth( azimuthDefault )
-
-            if (panorama[0].link_foto !== panoramaUrl) {
-
-                setPanoramaUrl(panorama[0].link_foto)
-                console.log(`O panorama está a ${panorama[0].distance_to_click} metros do ponto clicado`, panorama[0])
-                map.addLayer(buildMarkerLayer([panorama[0].x,panorama[0].y],'pano'))
-            }
-        }
-    },[panorama])
+    },[panoramaData])
 
     function calculateTriangleCoords(anchor: Array<number>, base: number, height: number, rotation: number) {
         const phi = (rotation * Math.PI) / 180; // Convert rotation to radians
+
+        if (Math.abs(base) > height) {
+            base = height
+        }
     
         const Xa = anchor[0];
         const Ya = anchor[1];
@@ -209,7 +192,7 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
 
     useEffect(() => {
 
-        if (panorama[0]) {
+        if (panorama && azimuth && azimuthClick && azimuthDefault) {
 
             const triangleStyle = new Style({
                 fill: new Fill({ color: 'rgba(255, 0, 0, 0.5)' }),
@@ -221,7 +204,7 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
         
             const triangleLayer = new VectorLayer({
                 source: new VectorSource({
-                    features: [new Feature(new Polygon([calculateTriangleCoords([panorama[0].x,panorama[0].y], (20/(1-Math.abs(pitch)))*(120-zoom)/120, 30, azimuthClick + (azimuth - azimuthDefault) )]))]
+                    features: [new Feature(new Polygon([calculateTriangleCoords([panorama.x,panorama.y], (20/(1-Math.abs(pitch)))*(120-zoom)/120, 30, azimuthClick + (azimuth - azimuthDefault) )]))]
                 }),
                 style: triangleStyle,
                 properties: {
@@ -247,15 +230,24 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
             AzimuthClick: ${azimuthClick}`)
         }
 
-    },[azimuthDefault,zoom,pitch,panorama])
-    
-    return (
-        (isLoading) ? (
-            <LoadingPlaceHolder>Carregando...</LoadingPlaceHolder>
-        ) : (
+    },[azimuthDefault,zoom,pitch])
+
+    if (coords[0] === 0 && coords[1] === 0) {
+        return (
+            <LoadingPlaceHolder>
+               Nenhum panorama selecionado
+            </LoadingPlaceHolder>
+        )
+    } else if (isLoading || (isSuccess && !panorama)) {
+        return (
+            <LoadingPlaceHolder>
+                Carregando...
+            </LoadingPlaceHolder>
+        )
+    } else if (isSuccess && panorama) {
+        return (
             <div className="container-photo-sphere">
                 <ReactPhotoSphereViewer 
-                    ref={photoSphereRef}
                     onPositionChange={(lat,lng) => {
                         setAzimuth(lng * 180 / Math.PI)
                         setPitch(lat)
@@ -263,7 +255,7 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
                     onZoomChange={(e) => {
                         setZoom(e.zoomLevel)
                     }}
-                    src={panoramaUrl}
+                    src={panorama.link_foto}
                     defaultYaw={`${azimuthDefault}deg`}
                     useXmpData={false}
                     defaultZoomLvl={1}
@@ -272,5 +264,11 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
                     container={'container-photo-sphere'}/>
             </div>
         )
-    )
+    } else {
+        return (
+            <LoadingPlaceHolder>
+                Erro ao carregar panorama
+            </LoadingPlaceHolder>
+        )
+    }
 }
