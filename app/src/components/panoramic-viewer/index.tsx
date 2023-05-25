@@ -51,6 +51,8 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
 
         if(coords[0] !== 0 && coords[1] !== 0) {
 
+            map.addLayer(buildMarkerLayer(coords))
+
             try {
                 
                 let panoramas = await api.get(`/360/${coords[0]}/${coords[1]}`)
@@ -131,25 +133,15 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
                 keepItLessThan360(panoramaData.azimuth_to_click * 180 / Math.PI) 
                 )
             setAzimuthDefault( 
-                keepItLessThan360(
-                    360 
-                    - Number(panoramaData.azimuth) 
-                    + keepItLessThan360(  Number(panoramaData.azimuth_to_click * 180 / Math.PI)) 
-                )
+                keepItLessThan360 (panoramaData.azimuth_to_click * 180 / Math.PI)
             );
             setAzimuth( 
-                keepItLessThan360(
-                    360 
-                    - Number(panoramaData.azimuth) 
-                    + keepItLessThan360(  Number(panoramaData.azimuth_to_click * 180 / Math.PI)) 
-                )
+                keepItLessThan360 (panoramaData.azimuth_to_click * 180 / Math.PI) 
             )
             
             setPanorama(panoramaData)
-            console.log(`O panorama está a ${panoramaData.distance_to_click} metros do ponto clicado`, panoramaData)
+            console.log(`O panorama está a ${panoramaData.distance_to_click} metros, tomado com azimute ${panoramaData.azimuth}`, panoramaData)
             map.addLayer(buildMarkerLayer([panoramaData.x,panoramaData.y],'pano'))
-
-            map.addLayer(buildMarkerLayer(coords))
         }
     },[panoramaData])
 
@@ -204,7 +196,13 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
         
             const triangleLayer = new VectorLayer({
                 source: new VectorSource({
-                    features: [new Feature(new Polygon([calculateTriangleCoords([panorama.x,panorama.y], (20/(1-Math.abs(pitch)))*(120-zoom)/120, 30, azimuthClick + (azimuth - azimuthDefault) )]))]
+                    features: [new Feature(new Polygon([
+                        calculateTriangleCoords(
+                            [panorama.x,panorama.y], 
+                            (20/(1-Math.abs(pitch)))*(120-zoom)/120, 30, 
+                            azimuthClick + (azimuth - azimuthDefault) + Number(panoramaData.azimuth)
+                        )
+                    ]))]
                 }),
                 style: triangleStyle,
                 properties: {
@@ -225,8 +223,10 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
             map.addLayer(triangleLayer);
             console.log(`
             zoom: ${zoom} & pitch: ${pitch}
-            Current azimuth: ${azimuth}
-            Azimuth Default: ${azimuthDefault}
+            panoramaData.azimuth: ${panoramaData.azimuth}
+            panoramaData.azimuthToClick: ${ keepItLessThan360 (panoramaData.azimuth_to_click * 180 / Math.PI) }
+            Current panorama azimuth: ${azimuth}
+            AzimuthDefault: ${azimuthDefault}
             AzimuthClick: ${azimuthClick}`)
         }
 
