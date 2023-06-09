@@ -136,7 +136,7 @@ function Map() {
       map.un('moveend', moveEndEventHandler)
       map.un('pointermove', pointerMoveEventHandler)
     }
-  },[])
+  },[enabledTool])
 
   useEffect(() => {
     if(layers && layerOrder) {
@@ -305,8 +305,6 @@ function Map() {
 
   function singleClickEventHandler(e: any) {
     
-    console.log(enabledToolRef)
-
     if (enabledToolRef.current === '360') {
       if (e.coordinate !== streetViewCoordinates) {
         setdisplayRightSidePanel(true)
@@ -337,7 +335,7 @@ function Map() {
             layers: lyrs?.join(','),
             query_layers: lyrs?.join(',')
           }
-        )
+          )
   
         if (url !== getFeatureInfoUrl) {
           setGetFeatureInfoUrl(url?.replace('api/map','map/info')!)
