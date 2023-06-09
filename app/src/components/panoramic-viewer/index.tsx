@@ -45,8 +45,6 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
 
     async function getPanorama() {
 
-        console.log(coords)
-
         clearPanoramaLayers()
 
         if(coords[0] !== 0 && coords[1] !== 0) {
@@ -56,7 +54,7 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
             try {
                 
                 let panoramas = await api.get(`/360/${coords[0]}/${coords[1]}`)
-                
+
                 return panoramas.data
             } catch (error) {
                 
@@ -125,8 +123,6 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
     
     useEffect(() => {
 
-        console.log(panoramaData)
-        
         if(panoramaData && coords[0] !== 0 && coords[1] !== 0 && isSuccess) {
     
             setAzimuthClick( 
@@ -140,7 +136,7 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
             )
             
             setPanorama(panoramaData)
-            console.log(`O panorama está a ${panoramaData.distance_to_click} metros, tomado com azimute ${panoramaData.azimuth}`, panoramaData)
+            // console.log(`O panorama está a ${panoramaData.distance_to_click} metros, tomado com azimute ${panoramaData.azimuth}`, panoramaData)
             map.addLayer(buildMarkerLayer([panoramaData.x,panoramaData.y],'pano'))
         }
     },[panoramaData])
@@ -164,20 +160,20 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
         const X2 = Xa + l * Math.sin(phi + t)
         const Y2 = Ya + l * Math.cos(phi + t)
 
-        console.log(`
-            Rotation: ${rotation}
-            Base: ${base}
-            Height: ${height}
-            Rotation (phi): ${phi}
-            t: ${t}
-            l: ${l}
-            Xa: ${Xa}
-            Ya: ${Ya}
-            X1: ${X1}
-            Y1: ${Y1}
-            X2: ${X2}
-            Y2: ${Y2}
-        `)
+        // console.log(`
+        //     Rotation: ${rotation}
+        //     Base: ${base}
+        //     Height: ${height}
+        //     Rotation (phi): ${phi}
+        //     t: ${t}
+        //     l: ${l}
+        //     Xa: ${Xa}
+        //     Ya: ${Ya}
+        //     X1: ${X1}
+        //     Y1: ${Y1}
+        //     X2: ${X2}
+        //     Y2: ${Y2}
+        // `)
     
         return [[Xa, Ya], [X1, Y1], [X2, Y2], [Xa, Ya]];
       };
@@ -221,13 +217,13 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
             }
         
             map.addLayer(triangleLayer);
-            console.log(`
-            zoom: ${zoom} & pitch: ${pitch}
-            panoramaData.azimuth: ${panoramaData.azimuth}
-            panoramaData.azimuthToClick: ${ keepItLessThan360 (panoramaData.azimuth_to_click * 180 / Math.PI) }
-            Current panorama azimuth: ${azimuth}
-            AzimuthDefault: ${azimuthDefault}
-            AzimuthClick: ${azimuthClick}`)
+            // console.log(`
+            // zoom: ${zoom} & pitch: ${pitch}
+            // panoramaData.azimuth: ${panoramaData.azimuth}
+            // panoramaData.azimuthToClick: ${ keepItLessThan360 (panoramaData.azimuth_to_click * 180 / Math.PI) }
+            // Current panorama azimuth: ${azimuth}
+            // AzimuthDefault: ${azimuthDefault}
+            // AzimuthClick: ${azimuthClick}`)
         }
 
     },[azimuthDefault,zoom,pitch])
