@@ -37,7 +37,7 @@ interface Layer {
 const map = new OlMap({
   view: new OlView({
     center: fromLonLat([-43.80376, -20.25554]),
-    zoom: 14,
+    zoom: 19,
   })
 });
 
@@ -109,6 +109,7 @@ function Map() {
   const[layerOrder,setLayerOrder] = useState<string>('')
   const[layers,setLayers] = useState<Array<Layer>>()
   const[getFeatureInfoUrl,setGetFeatureInfoUrl] = useState<string>()
+  const[streetViewCoordinates,setStreetViewCoordinates] = useState<Array<number>>([0,0])
 
   // Info Panel states
   const[displayLeftSidePanel,setdisplayLeftSidePanel] = useState(false)
@@ -117,10 +118,25 @@ function Map() {
   const[isLoadingInfoPanel,setIsLoadingInfoPanel] = useState(false)
 
   // Tools states & refs
-  const[isEnabledToolbox,setIsEnabledToolbox] = useState(false)
+  const[enabledTool,setEnabledTool] = useState('info')
+  const enabledToolRef = useRef(enabledTool)
   const[coordinatesOnDisplay,setCoordinatesOnDisplay] = useState<number[]>([0,0])
   const[coordinatesOnMouse,setCoordinatesOnMouse] = useState<number[]>([0,0])
   const[coordinatesDisplayMode,setCoordinatesDisplayMode] = useState('centro')
+
+  useEffect(() => {
+
+    map.on('singleclick', singleClickEventHandler);
+    map.on('moveend', moveEndEventHandler)
+    map.on('pointermove', pointerMoveEventHandler)
+
+    return () => {
+      
+      map.un('singleclick', singleClickEventHandler);
+      map.un('moveend', moveEndEventHandler)
+      map.un('pointermove', pointerMoveEventHandler)
+    }
+  },[])
 
   useEffect(() => {
     if(layers && layerOrder) {
@@ -213,18 +229,23 @@ function Map() {
   },[projectId])
 
   useEffect(() => {
-    if (getFeatureInfoUrl && !isEnabledToolbox) {
+    if (getFeatureInfoUrl && enabledTool === 'info') {
 
       getFeatureInfo(getFeatureInfoUrl)
     }
   },[getFeatureInfoUrl])  
 
   useEffect(() => {
-    if (isEnabledToolbox) {
-
-      toast.info('A seleção de feições no mapa foi desabilitada, desative a caixa de ferramentas para ativá-la novamente')
+    enabledToolRef.current = enabledTool
+    if (enabledTool === '360') {
+      toast.info('A ferramenta de visualização 360° foi ativada, desative para obter informações das feições com o clique')
+    } else if (enabledTool === 'toolbox') {
+      toast.info('A ferramenta de medidas foi ativada, desative para obter informações das feições com o clique')
+    } else {
+      toast.info('A ferramenta de obter informações com o clique foi ativada')
     }
-  },[isEnabledToolbox])
+  }, [enabledTool])
+
 
   useEffect(() => {
 
@@ -250,7 +271,7 @@ function Map() {
       ])
     }
   },[coordinatesDisplayMode])
-  
+
   async function getFeatureInfo(url: string) {
 
     setIsLoadingInfoPanel(true)  
@@ -282,7 +303,16 @@ function Map() {
     }
   }
 
-  map.on('singleclick', (e) => {
+  function singleClickEventHandler(e: any) {
+    
+    console.log(enabledToolRef)
+
+    if (enabledToolRef.current === '360') {
+      if (e.coordinate !== streetViewCoordinates) {
+        setdisplayRightSidePanel(true)
+        setStreetViewCoordinates(e.coordinate)
+      }
+    } else if (enabledToolRef.current === 'info') {
 
       const viewResolution = (map.getView().getResolution());
 
@@ -314,9 +344,9 @@ function Map() {
         }
       }
     }
-  );
+  }
 
-  map.on('moveend', (e) => {
+  function moveEndEventHandler(e: any) {
 
     if(coordinatesDisplayMode === 'centro') {
 
@@ -334,15 +364,15 @@ function Map() {
         transformedCoordinatesSE[1]
       ])
     }
-  })
+  }
 
-  map.on('pointermove', (e) => {
+  function pointerMoveEventHandler(e: any) {
 
     if(e.coordinate && coordinatesDisplayMode === 'mouse') {
       var transformedCoordinates = toLonLat(e.coordinate)
       setCoordinatesOnMouse(transformedCoordinates)
     }
-  })
+  }
 
   function switchLeftPanel() {
 
@@ -354,10 +384,6 @@ function Map() {
     setdisplayRightSidePanel(!displayRightSidePanel)
   }
   
-  function streetView(e: any) {
-    console.log('veremos em breve')
-  }
-
   function buildQGISLayers(layers: any, order: string) {
 
     const content = order.split(',').map(
@@ -485,11 +511,17 @@ function Map() {
           </LeftSidePanelSwitcher>
           <ButtonsContainer>
             <MapButton 
-              onClick={() => setIsEnabledToolbox(!isEnabledToolbox)}
+              onClick={(e) => {
+                if (enabledTool === 'toolbox') {
+                  setEnabledTool('info')
+                } else {
+                  setEnabledTool('toolbox')
+                }
+              }}
             >
-              <FaToolbox/>
+              {(enabledTool === 'toolbox') ? <FaToolbox color='green'/> : <FaToolbox /> }
             </MapButton>
-            <Toolbox display={isEnabledToolbox}>
+            <Toolbox display={enabledTool === 'toolbox'}>
               <MapButton>
                 <MeasureButton
                   name="distance"
@@ -524,8 +556,14 @@ function Map() {
                 </MeasureButton>
               </MapButton>
             </Toolbox>
-            <MapButton onClick={streetView}>
-              <FaStreetView />
+            <MapButton onClick={(e) => {
+                if (enabledTool === '360') {
+                  setEnabledTool('info')
+                } else {
+                  setEnabledTool('360')
+                }
+              }}>
+              {(enabledTool === '360') ? <FaStreetView color='green'/> : <FaStreetView /> }
             </MapButton>
           </ButtonsContainer>
           <SearchBox 
@@ -544,7 +582,7 @@ function Map() {
           </RightSidePanelSwitcher>
         </MiddlePanel>
         <RightSidePanel display={displayRightSidePanel}>
-            <PanoramicViewer></PanoramicViewer>
+            <PanoramicViewer coords={streetViewCoordinates} map={map}></PanoramicViewer>
         </RightSidePanel>
       </Container>
       <Footer>

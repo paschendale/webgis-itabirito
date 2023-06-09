@@ -5,14 +5,19 @@ import './index.css';
 import Map from './pages/webgis'
 import Geoportal from './pages/geoportal';
 import { Login } from './pages/login/login';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 // import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
+
+const queryClient = new QueryClient();
+
 root.render(
   <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
     <BrowserRouter basename='/'>
       <Switch>
         <Route exact path="/">
@@ -29,6 +34,7 @@ root.render(
         </Route>
       </Switch>
     </BrowserRouter>
+    </QueryClientProvider>
   </React.StrictMode>
 );
 

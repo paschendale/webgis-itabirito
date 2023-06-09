@@ -90,20 +90,21 @@ function FeatureContainer({feature,index,map}: FeatureContainerProps) {
           <FeatureId>{featurePk}</FeatureId>
         </TextArea>
         <ButtonArea>
-          {feature.properties && <EachButton>
+          {/* {feature.properties && <EachButton>
             <FaFilePdf 
               size={25} 
               onClick={
                 () => console.log(`i'm clicked`)
               }
             />
-          </EachButton>}
+          </EachButton>} */}
           {feature.bbox && <EachButton>
             <FaMapMarkerAlt 
               size={25} 
-              onClick={
+              onClick={ (e: any) => {
+                // console.log(e)
                 fitBounds(map,feature.bbox)
-              }
+              }}
             />
           </EachButton>}
         </ButtonArea>
