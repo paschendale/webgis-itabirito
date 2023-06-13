@@ -136,7 +136,7 @@ function Map() {
       map.un('moveend', moveEndEventHandler)
       map.un('pointermove', pointerMoveEventHandler)
     }
-  },[enabledTool])
+  },[enabledTool,layers])
 
   useEffect(() => {
     if(layers && layerOrder) {
@@ -323,7 +323,7 @@ function Map() {
         var source = mapLayers[0].getSource() as TileWMS
   
         var lyrs = layers?.filter(e => e['@_queryable'] === '1').map(e => e.Name)
-  
+        
         var url = source.getFeatureInfoUrl(
           e.coordinate,
           viewResolution!,
