@@ -63,7 +63,7 @@ export function Relatorio() {
             {
               attributesToArray(values).map((e: any, i: number) => {
 
-                if (e.key !== 'geom' && e.key !== 'entityName') {
+                if (e.key !== 'geom' && e.key !== 'entityName' && e.key !== 'imgMap' && e.key !== 'imgFoto') {
                   return (
                     <div className="each-attribute-container" key={i}>
                       <p><b> {e.key}: &nbsp; </b> {e.value}</p>

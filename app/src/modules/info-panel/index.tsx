@@ -142,7 +142,7 @@ function FeatureContainer({feature,index,map}: FeatureContainerProps) {
         {
           attributesToArray(feature.properties).map((e: any, i: number) => {
 
-            if (e.key !== 'geom') {
+            if (e.key !== 'geom' && e.key !== 'entityName' && e.key !== 'imgMap' && e.key !== 'imgFoto') {
               return (
                 <PropertyContainer key={i}>
                   <PropertyName>

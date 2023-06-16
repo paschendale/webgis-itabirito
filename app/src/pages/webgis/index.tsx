@@ -138,9 +138,10 @@ function Map() {
       map.un('moveend', moveEndEventHandler)
       map.un('pointermove', pointerMoveEventHandler)
     }
-  },[])
+  },[enabledTool,layers])
 
   useEffect(() => {
+
     if(layers && layerOrder) {
 
       buildQGISLayers(layers,layerOrder)
