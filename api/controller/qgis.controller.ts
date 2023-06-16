@@ -132,6 +132,12 @@ export async function getProjectSettingsController(req: Request, res: Response) 
 
 export async function getMapController(req: Request, res: Response) {
 
+  var request = req.query["Request"] || req.query["REQUEST"] || req.query["request"]
+
+  if (request !== 'GetMap') {
+    return res.status(403).json({message: `Request method ${request}`})
+  }
+
   try {
 
     const response = await getMap(req.params.projectId,req.query)

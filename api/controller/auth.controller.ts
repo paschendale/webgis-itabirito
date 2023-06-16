@@ -20,9 +20,15 @@ export async function loginController(req: Request, res: Response) {
     const response = await loginService(email,password)
 
     return res.send(response)
-  } catch (error) {
+  } catch (error: any) {
     
-    res.status(500).send(error)
+    if (error.response) {
+
+      res.status(error.response.status).send(error)
+    } else {
+
+      res.status(500).send(error)
+    }
   }
 }
 

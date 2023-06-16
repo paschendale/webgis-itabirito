@@ -3,7 +3,7 @@ import denim from "./../../assets/denim.webp";
 
 export const Container = styled.div`
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - 25px);
   z-index: 1;
   display: flex;
   flex-direction: row;
@@ -50,7 +50,7 @@ export const LeftSidePanelSwitcher = styled.div`
   position: absolute;
   width: 14px;
   height: 50px;
-  bottom: 10px;
+  bottom: 35px;
   border: none;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
@@ -96,7 +96,7 @@ export const RightSidePanelSwitcher = styled.div`
 
 export const ButtonsContainer = styled.div`
   margin-top: 80px;
-  margin-left: 10px;
+  margin-left: 8px;
   z-index: 1000;
   position: absolute;
   background: whitesmoke;
@@ -120,22 +120,108 @@ export const Placeholder = styled.div`
   height: 100%;
   background-color: red;
 `
-export const Version = styled.div`
-  z-index: 10000;
-  position: absolute;
-  bottom: 5px;
+export const Footer = styled.div`
+  height: 25px;
+  width: 100%;
   left: 50%;
+  z-index: 10000;
+  position: relative;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   background-color: rgb(255,255,255,0.5);
-  font-size: xx-small;
-  border-radius: 4px;
-  opacity: 0.5;  
+  font-size: x-small;
   
   @media (prefers-color-scheme: dark) {
-    color: rgb(180,180,180);
-    background-color: rgb(0,0,0,0.8);
+    color: whitesmoke;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.50), rgba(0, 0, 0, 0.50)), url(${denim});
   }
+`
+
+export const VersionContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-left: 25px;
+`
+
+export const CoordinatesContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-right: 25px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`
+
+export const MapContainer = styled.div `
+  width: 100%;
+  height: 100%;
+  text-shadow: 1px 1px 5px #000000;
+  
+  @media (prefers-color-scheme: dark) {
+    color: whitesmoke;
+    font-weight: 600;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.50), rgba(0, 0, 0, 0.50)), url(${denim});
+  }
+
+  .map {
+    height: 100%;
+  }
+
+  .ol-control {
+    color: black;
+    background-color: whitesmoke;
+    border: none;    
+    box-shadow: rgba(0, 0, 0, 0.5) 2px 2px 2px 0px;
+    border-radius: 4px;
+    padding: 0;
+
+    button {
+      cursor: pointer;
+      pointer-events: all;      
+      background-color: whitesmoke;
+      color: black;
+      border-radius: 4px;
+
+      @media (prefers-color-scheme: dark) {
+        color: rgb(180,180,180);
+        background-image: linear-gradient(rgba(0, 0, 0, 0.50), rgba(0, 0, 0, 0.50)), url(${denim});
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      color: rgb(180,180,180);
+      background-image: linear-gradient(rgba(0, 0, 0, 0.50), rgba(0, 0, 0, 0.50)), url(${denim});
+    }
+  }
+
+  .ol-zoom-out {   
+    margin: 0;
+    border: 1px solid rgba(0,0,0,0.2);  
+    border-top: none;   
+    width: 32px;
+    height: 32px;
+  }
+
+  .ol-zoom-in {    
+    margin: 0;
+    border: 1px solid rgba(0,0,0,0.2);    
+    width: 32px;
+    height: 32px;
+  }
+
+  .ol-attribution {
+    display: none;
+  }
+`
+
+type ToolboxProps = {
+  display: boolean;
+}
+
+export const Toolbox = styled.div<ToolboxProps>`
+  display: ${(props: ToolboxProps) => ((props.display)? 'auto' : 'none')};
+  transition: all 0.2s;
 `
