@@ -91,6 +91,10 @@ export const RelatorioContainer = styled.div`
     border: 1px solid black;
   }
 
+  .foto-image {
+    width: 380px;
+  }
+
   .atributos-container {
     height: 100%;
     width: 97.5%;
