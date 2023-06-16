@@ -15,8 +15,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import MapButton from '../../components/mapButton';
 import OlMap from 'ol/Map';
 import OlView from 'ol/View';
-import TileLayer from 'ol/layer/Tile.js';
+import ImageWMS from 'ol/source/ImageWMS';
+import ImageLayer from 'ol/layer/Image.js';
 import TileWMS from 'ol/source/TileWMS.js';
+import TileLayer from 'ol/layer/Tile.js';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import { Circle, Fill, Stroke, Style } from "ol/style";
 import { Vector as VectorSource } from "ol/source";
@@ -136,7 +138,7 @@ function Map() {
       map.un('moveend', moveEndEventHandler)
       map.un('pointermove', pointerMoveEventHandler)
     }
-  },[enabledTool,layers])
+  },[])
 
   useEffect(() => {
     if(layers && layerOrder) {
@@ -392,21 +394,49 @@ function Map() {
         
         if(!baseLayer) {
           baseLayer = false
-        }
 
-        var olLayer = new TileLayer({
-          source: new TileWMS({
-            url: `/api/map/${projectId}`,
-            params: {
-              'layers': layer.Name, 
-              'format': baseLayer ? 'image/jpeg' : 'image/png',
-              'maxZoom': 30,
-              'transparent': !baseLayer
-            }
-          }),
-        })
-    
-        map.addLayer(olLayer)
+          var olImageLayer = new ImageLayer({
+            extent: map.getView().calculateExtent(map.getSize()),
+            source: new ImageWMS({
+              url: `/api/map/${projectId}`,
+              params: {
+                'layers': layer.Name, 
+                'format': 'image/png',
+                'maxZoom': 30,
+                'transparent': true,
+                'tiled': false
+              },
+              ratio: 1
+            }),
+          })
+          
+          map.addLayer(olImageLayer)
+
+          // Listen for view changes and update the image layer extent
+          map.getView().on('change:resolution', () => {
+            olImageLayer.setExtent(map.getView().calculateExtent(map.getSize()));
+          });
+
+          map.getView().on('change:center', () => {
+            olImageLayer.setExtent(map.getView().calculateExtent(map.getSize()));
+          });
+        } else {
+
+          var olTileLayer = new TileLayer({
+            source: new TileWMS({
+              url: `/api/map/${projectId}`,
+              params: {
+                'layers': layer.Name, 
+                'format': 'image/jpeg',
+                'maxZoom': 30,
+                'transparent': false,
+                'tiled': true
+              }
+            }),
+          })
+      
+          map.addLayer(olTileLayer)
+        }
       })
 
     return content
