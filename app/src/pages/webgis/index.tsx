@@ -227,6 +227,7 @@ function Map() {
       setLayers(settings.layers.Layer)
       setProjectSettings(settings)
       map.getAllLayers().filter(layer => layer.get('name') === 'react-geo_measure')[0].setZIndex(1000)
+      map.set('projectId',projectId)
     })
     .catch((error: any) => null)
   },[projectId])
@@ -433,9 +434,10 @@ function Map() {
                 'transparent': false,
                 'tiled': true
               }
-            }),
+            })
           })
       
+          map.set('baseLayer',layer.Name)
           map.addLayer(olTileLayer)
         }
       })

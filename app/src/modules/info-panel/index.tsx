@@ -31,6 +31,7 @@ interface FeatureContainerProps {
 }
 
 function FeatureContainer({feature,index,map}: FeatureContainerProps) {
+
   const[open,setOpen] = useState(false)
 
   function fitBounds(map: OlMap, bbox: [number, number, number, number]): any {
@@ -53,32 +54,69 @@ function FeatureContainer({feature,index,map}: FeatureContainerProps) {
     }
   }
 
-  // function getFeatureMiniature(feature: any): string {
+  function generateGetMapURL(feature: any): any {
 
-  // snippet para obter miniatura da feicao em imageLayer
-  // var olImageLayer = new ImageLayer({
-  //   extent: map.getView().calculateExtent(map.getSize()),
-  //   source: new ImageWMS({
-  //     url: `/api/map/${projectId}`,
-  //     params: {
-  //       'layers': layer.Name, 
-  //       'format': 'image/png',
-  //       'maxZoom': 30,
-  //       'transparent': true,
-  //       'tiled': false
-  //     },
-  //     ratio: 1
-  //   }),
-  // })
+    if (!feature.bbox || !map.get('projectId')) {
+      return undefined
+    }
+
+    var extent = feature.bbox
+
+    var os_x = (extent[2] - extent[0])*1.0001
+    var os_y = (extent[3] - extent[1])*1.0001
+
+    extent = [
+      extent[0] - os_x,
+      extent[1] - os_y,
+      extent[2] + os_x,
+      extent[3] + os_y
+    ]
+
+    // console.log('extent:', extent)
+    var featureId = feature.id.split('.')
+    // console.log(featureId)
+    var featurePk = featureId.pop()
+    // console.log(featurePk)
+    var featureTitle = featureId.join('.')
+    // console.log(featureTitle)
+
+    const service = 'WMS';
+    const version = '1.1.1';
+    const request = 'GetMap';
+    const format = 'image/png';
+    const transparent = true;
+    const layers = `${map.get('baseLayer')},${featureTitle}`;
+    const width = 380;
+    const height = 300;
+    const crs = 'EPSG:3857';
+    const selection = `${featureTitle}:${featurePk}`;
   
-  // map.addLayer(olImageLayer)
+    const extentBbox = extent.join(',');
+  
+    const urlParams = new URLSearchParams();
+    urlParams.set('SERVICE', service);
+    urlParams.set('VERSION', version);
+    urlParams.set('REQUEST', request);
+    urlParams.set('FORMAT', format);
+    urlParams.set('TRANSPARENT', String(transparent));
+    urlParams.set('layers', layers);
+    urlParams.set('WIDTH', String(width));
+    urlParams.set('HEIGHT', String(height));
+    urlParams.set('CRS', crs);
+    urlParams.set('BBOX', extentBbox);
+    urlParams.set('SELECTION', selection);
+  
+    return `/api/map/${map.get('projectId')}?${urlParams.toString()}`
+  }
+  
+  function getFeatureMiniature(feature: any): string {
 
-  //   if(feature.geometry) {
-  //     return 'http://via.placeholder.com/300x80/000000?text=there is miniature'
-  //   } else {
-  //     return 'http://via.placeholder.com/300x80/000000?text=nothing to see here'
-  //   }
-  // }
+    if(feature.geometry) {
+      return generateGetMapURL(feature)
+    } else {
+      return ''
+    }
+  }
 
   function attributesToArray(object: any) {
 
@@ -96,11 +134,13 @@ function FeatureContainer({feature,index,map}: FeatureContainerProps) {
     return attributesArray;
   }
 
-  function openReport(properties: any, title: string) {
+  function openReport(feature:any, title: string) {
+
+    var properties = feature.properties
 
     properties['entityName'] = title 
-    // properties['imgMap'] = `` 
-    // properties['imgFoto'] = `` 
+    properties['imgMap'] = generateGetMapURL(feature) 
+    properties['imgFoto'] = properties.link_foto || properties.foto || ''
     const queryString = new URLSearchParams(properties).toString();
     const url = `/relatorio?${queryString}`;
     window.open(url, '_blank');
@@ -112,7 +152,9 @@ function FeatureContainer({feature,index,map}: FeatureContainerProps) {
 
   return (
     <>
-      <FeatureTitleContainer key={index} onClick={() => setOpen(!open)}>
+      <FeatureTitleContainer key={index} background={getFeatureMiniature(feature)}
+        onClick={() => { setOpen(!open); }
+        }>
         <TextArea>
           <FeatureTitle>{featureTitle}</FeatureTitle>
           <FeatureId>{featurePk}</FeatureId>
@@ -122,7 +164,7 @@ function FeatureContainer({feature,index,map}: FeatureContainerProps) {
             <FaFilePdf 
               size={25} 
               onClick={
-                () => openReport(feature.properties,featureTitle)
+                () => openReport(feature,featureTitle)
               }
             />
           </EachButton>}

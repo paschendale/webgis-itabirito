@@ -24,7 +24,8 @@ interface FeatureTitleContainerProps {
 }
 
 export const FeatureTitleContainer = styled.div<FeatureTitleContainerProps>`
-  background-image: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 90%),url(${featurePlaceholder});
+  background-image: linear-gradient(90deg, rgba(0,0,0,0.4) 30%, rgba(0,0,0,0.8) 90%), url(${props => props.background || featurePlaceholder});
+  background-position: center;
   background-size: 110%;
   width: 100%;
   max-width: 320px;
@@ -41,7 +42,8 @@ export const FeatureTitleContainer = styled.div<FeatureTitleContainerProps>`
 
   &:hover {
     height: 120px;
-    background-image: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 90%), url(${featurePlaceholder});
+    background-image: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 90%), url(${props => props.background || featurePlaceholder});
+    background-position: center;
     background-size: 100%;
   }
 `
