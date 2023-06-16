@@ -55,6 +55,24 @@ function FeatureContainer({feature,index,map}: FeatureContainerProps) {
 
   // function getFeatureMiniature(feature: any): string {
 
+  // snippet para obter miniatura da feicao em imageLayer
+  // var olImageLayer = new ImageLayer({
+  //   extent: map.getView().calculateExtent(map.getSize()),
+  //   source: new ImageWMS({
+  //     url: `/api/map/${projectId}`,
+  //     params: {
+  //       'layers': layer.Name, 
+  //       'format': 'image/png',
+  //       'maxZoom': 30,
+  //       'transparent': true,
+  //       'tiled': false
+  //     },
+  //     ratio: 1
+  //   }),
+  // })
+  
+  // map.addLayer(olImageLayer)
+
   //   if(feature.geometry) {
   //     return 'http://via.placeholder.com/300x80/000000?text=there is miniature'
   //   } else {
@@ -78,6 +96,16 @@ function FeatureContainer({feature,index,map}: FeatureContainerProps) {
     return attributesArray;
   }
 
+  function openReport(properties: any, title: string) {
+
+    properties['entityName'] = title 
+    // properties['imgMap'] = `` 
+    // properties['imgFoto'] = `` 
+    const queryString = new URLSearchParams(properties).toString();
+    const url = `/relatorio?${queryString}`;
+    window.open(url, '_blank');
+  }
+
   var featureId = feature.id.split('.')
   var featurePk = featureId.pop()
   var featureTitle = featureId.join('.')
@@ -90,14 +118,14 @@ function FeatureContainer({feature,index,map}: FeatureContainerProps) {
           <FeatureId>{featurePk}</FeatureId>
         </TextArea>
         <ButtonArea>
-          {/* {feature.properties && <EachButton>
+          {feature.properties && <EachButton>
             <FaFilePdf 
               size={25} 
               onClick={
-                () => console.log(`i'm clicked`)
+                () => openReport(feature.properties,featureTitle)
               }
             />
-          </EachButton>} */}
+          </EachButton>}
           {feature.bbox && <EachButton>
             <FaMapMarkerAlt 
               size={25} 

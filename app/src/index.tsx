@@ -6,6 +6,7 @@ import Map from './pages/webgis'
 import Geoportal from './pages/geoportal';
 import { Login } from './pages/login/login';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Relatorio } from './pages/relatorio'
 // import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(
@@ -28,6 +29,9 @@ root.render(
         </Route>
         <Route path="/map">
           <Map />
+        </Route>
+        <Route path="/relatorio">
+          <Relatorio />
         </Route>
         <Route path="/login">
           <Login />
