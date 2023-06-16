@@ -95,7 +95,7 @@ export async function verifyTable(tableName: string, tableSchema?: string) {
       WHERE 
         t.table_name = '${tableName}' AND 
         c.table_schema = '${tableSchema}'  AND 
-        c.data_type = 'text'
+       ( c.data_type LIKE '%text%' OR c.data_type LIKE '%char%')
     ) sb ON true
     WHERE 
       t.table_name = '${tableName}' AND 
