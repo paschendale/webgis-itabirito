@@ -51,9 +51,13 @@ export function Relatorio() {
           </div>
         </div>
         <div className='body'>
-          {values.imgMap && <div className="midia-container">
-            <div className="map">map</div>
-            <div className="foto">foto</div>
+          {(values.imgMap || values.imgFoto) && <div className="midia-container">
+            <div className="map">
+              {(values.imgMap && values.imgMap !== "undefined") ? (<img src={values.imgMap} alt="Mapa" className="map-image" />) : (<img src="http://via.placeholder.com/380x300/FBFBFB?text=Esta entidade não possui uma representação geométrica" alt="Mapa" className="map-image" />)}
+            </div>
+            <div className="foto">
+              {(values.imgFoto) ? (<img src={values.imgFoto} alt="Foto" className="foto-image" />) : (<img src="http://via.placeholder.com/380x300/FBFBFB?text=Não existe nenhuma fotografia desta entidade" alt="Foto" className="foto-image" />)}
+            </div>
           </div>}
           <div className="atributos-title">
             Propriedades:
