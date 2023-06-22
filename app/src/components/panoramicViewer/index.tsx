@@ -251,7 +251,7 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
                     onZoomChange={(e) => {
                         setZoom(e.zoomLevel)
                     }}
-                    src={panorama.link_foto}
+                    src={`/api/proxy/${encodeURIComponent(panorama.link_foto)}`}
                     defaultYaw={`${azimuthDefault}deg`}
                     useXmpData={false}
                     defaultZoomLvl={1}

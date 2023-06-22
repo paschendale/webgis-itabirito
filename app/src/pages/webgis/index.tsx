@@ -7,7 +7,7 @@ import { api } from '../../services/api';
 import { toastError } from '../../utils';
 import { FaCaretLeft, FaCaretRight, FaCaretUp, FaCopy, FaDrawPolygon, FaGithub, FaRegCopy, FaRulerCombined, FaStreetView, FaToolbox } from 'react-icons/fa';
 import { HiOutlineSwitchVertical } from 'react-icons/hi';
-import PanoramicViewer from '../../components/panoramic-viewer';
+import PanoramicViewer from '../../components/panoramicViewer';
 import { useLocation } from 'react-router-dom';
 import pj from "./../../../package.json"
 import { ToastContainer, toast } from "react-toastify"
