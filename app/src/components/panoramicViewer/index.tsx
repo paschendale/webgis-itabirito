@@ -29,7 +29,6 @@ type PanoramicViewerProps = {
 }
 
 export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
-    const[panorama,setPanorama] = useState<any>()
     const[azimuth,setAzimuth] = useState<number>()
     const[azimuthDefault,setAzimuthDefault] = useState<number>()
     const[azimuthClick,setAzimuthClick] = useState<number>()
@@ -40,7 +39,7 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
         queryKey: [`/360/${coords[0]}/${coords[1]}`],
         queryFn: getPanorama,
         refetchOnWindowFocus: false,
-        refetchOnMount: true
+        refetchOnMount: true,
     });
 
     async function getPanorama() {
@@ -135,7 +134,6 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
                 keepItLessThan360 (panoramaData.azimuth_to_click * 180 / Math.PI) 
             )
             
-            setPanorama(panoramaData)
             // console.log(`O panorama está a ${panoramaData.distance_to_click} metros, tomado com azimute ${panoramaData.azimuth}`, panoramaData)
             map.addLayer(buildMarkerLayer([panoramaData.x,panoramaData.y],'pano'))
         }
@@ -180,7 +178,7 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
 
     useEffect(() => {
 
-        if (panorama && azimuth && azimuthClick && azimuthDefault) {
+        if (panoramaData && azimuth && azimuthClick && azimuthDefault) {
 
             const triangleStyle = new Style({
                 fill: new Fill({ color: 'rgba(255, 0, 0, 0.5)' }),
@@ -194,7 +192,7 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
                 source: new VectorSource({
                     features: [new Feature(new Polygon([
                         calculateTriangleCoords(
-                            [panorama.x,panorama.y], 
+                            [panoramaData.x,panoramaData.y], 
                             (20/(1-Math.abs(pitch)))*(120-zoom)/120, 30, 
                             azimuthClick + (azimuth - azimuthDefault) + Number(panoramaData.azimuth)
                         )
@@ -234,13 +232,13 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
                Nenhum panorama selecionado
             </LoadingPlaceHolder>
         )
-    } else if (isLoading || (isSuccess && !panorama)) {
+    } else if (isLoading || (isSuccess && !panoramaData) || !azimuthDefault) {
         return (
             <LoadingPlaceHolder>
                 Carregando...
             </LoadingPlaceHolder>
         )
-    } else if (isSuccess && panorama) {
+    } else if (isSuccess && azimuthDefault) {
         return (
             <div className="container-photo-sphere">
                 <ReactPhotoSphereViewer 
@@ -251,8 +249,8 @@ export default function PanoramicViewer({coords, map}: PanoramicViewerProps) {
                     onZoomChange={(e) => {
                         setZoom(e.zoomLevel)
                     }}
-                    src={`/api/proxy/${encodeURIComponent(panorama.link_foto)}`}
-                    defaultYaw={`${azimuthDefault}deg`}
+                    src={`/api/proxy/${encodeURIComponent(panoramaData.link_foto)}`}
+                    defaultYaw={`${keepItLessThan360 (panoramaData.azimuth_to_click * 180 / Math.PI)}deg`}
                     useXmpData={false}
                     defaultZoomLvl={1}
                     height={'calc(100vh - 25px)'} 
