@@ -1,4 +1,4 @@
-import { auth } from "../repository/auth";
+import { auth } from "../repository/auth.repo";
 
 export async function loginService(email: string, password: string) {
 

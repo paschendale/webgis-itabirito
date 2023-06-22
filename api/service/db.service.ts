@@ -1,5 +1,5 @@
 import { consoleLog } from "../utils";
-import connection from "./../repository/db";
+import connection from "../repository/db.repo";
 
 const db = connection();
 

@@ -1,4 +1,4 @@
-import { qgis } from "../repository/qgis";
+import { qgis } from "../repository/qgis.repo";
 
 export async function getCatalog(headers?: any) {
 
